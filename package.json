@@ -1,0 +1,37 @@
+{
+  "dependencies": {
+    "axios": "^1.7.9",
+    "body-parser": "^1.20.3",
+    "discord.js": "^14.16.3",
+    "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1",
+    "uuid": "^11.0.3",
+    "ws": "^8.18.0"
+  },
+  "name": "gd-macro-sharing",
+  "version": "1.0.0",
+  "description": "This bot is dedicated to assisting the GD Macro Sharing Discord Server",
+  "main": "server.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": ".silver_3",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Silver-3/GD-Macro-Sharing.git"
+  },
+  "keywords": [
+    "bot",
+    "macro",
+    "share",
+    "discord",
+    "geometry-dash"
+  ],
+  "bugs": {
+    "url": "https://github.com/Silver-3/GD-Macro-Sharing/issues"
+  },
+  "homepage": "https://github.com/Silver-3/GD-Macro-Sharing#readme"
+}

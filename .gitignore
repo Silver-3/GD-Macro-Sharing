@@ -1,0 +1,8 @@
+node_modules/
+logs/
+macros/
+config.json
+package-lock.json
+*.sqlite
+*.bat
+*.txt

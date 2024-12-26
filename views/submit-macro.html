@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submit Macro</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+  <div class="icon-text">
+    <img src="{{iconURL}}" alt="Icon" class="icon">
+    <span class="text">@{{userName}}</span>
+  </div>
+  
+  <div class="container">
+    <form action="/submit-macro" method="POST" enctype="multipart/form-data">
+      <h1>Submit Macro</h1>
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" required>
+      </div>
+      <div class="form-group">
+        <label for="author">Author</label>
+        <input type="text" id="author" name="author" required>
+      </div>
+      <div class="form-group">
+        <label for="id">ID</label>
+        <input type="number" id="id" name="id" required>
+      </div>
+      <div class="form-group checkbox-group">
+        <label for="noclip">Noclip</label>
+        <input type="checkbox" id="noclip" name="noclip">
+      </div>
+      <div class="form-group">
+        <label for="notes">Notes</label>
+        <input type="text" id="notes" name="notes">
+      </div>
+      <div class="form-group">
+        <label>Upload Macro</label>
+        <input type="file" id="macroFile" name="macroFile" required onchange="checkFile()">
+        <div class="characterLimit" id="characterLimit"></div>
+        <div class="fileType" id="fileType"></div>
+      </div>
+      <div class="form-group">
+        <button type="submit" id="submitButton">Submit</button>
+      </div>
+    </form>
+  </div>
+  <script>
+    function checkFile() {
+      const fileInput = document.getElementById("macroFile");
+      const fileTypeText = document.getElementById("fileType");
+      const submitButton = document.getElementById("submitButton");
+
+      if (fileInput.files.length > 0) {
+        const fileName = fileInput.files[0].name;
+        let fileType = fileName.split('.').pop();
+        const expectedFiletypes = ["gdr", "gdr.json", "mhr", "xd"];
+
+        if (fileName.endsWith('.gdr.json') || /\.gdr(\s*\(\d+\))?\.json$/.test(fileName)) {
+          fileType = 'gdr.json';
+        }
+
+        if (!expectedFiletypes.includes(fileType)) {
+          fileTypeText.textContent = `Invalid file type: .${fileType}`;
+          fileTypeText.style.color = "red";
+          submitButton.disabled = true;
+        } else {
+          fileTypeText.textContent = `Valid file type: .${fileType}`;
+          fileTypeText.style.color = "green";
+          submitButton.disabled = false;
+        }
+
+      } else {
+        fileTypeText.textContent = "";
+        submitButton.disabled = true;
+      }
+    }
+
+    function validateTemplate() {
+      const name = document.getElementById("name").value.trim();
+      const author = document.getElementById("author").value.trim();
+      const id = document.getElementById("id").value.trim();
+      const noclip = document.getElementById("noclip-checkbox").checked ? "yes" : "no";
+
+      const template = `${name} made by ${author} | noclip: ${noclip} | id: ${id}`;
+      const templateLength = template.length + 1;
+
+      const characterLimit = document.getElementById("characterLimit");
+      const submitButton = document.getElementById("submitButton");
+
+      if (templateLength > 100) {
+        characterLimit.textContent = `Character limit: ${templateLength}/100`;
+        characterLimit.style.color = "red";
+        submitButton.disabled = true;
+      } else {
+        characterLimit.textContent = `Character limit: ${templateLength}/100`;
+        characterLimit.style.color = "green";
+        submitButton.disabled = false;
+      }
+    }
+
+    document.getElementById("name").addEventListener("input", validateTemplate);
+    document.getElementById("author").addEventListener("input", validateTemplate);
+    document.getElementById("id").addEventListener("input", validateTemplate);
+    document.getElementById("noclip-checkbox").addEventListener("change", validateTemplate);
+  </script>
+</body>
+
+</html>

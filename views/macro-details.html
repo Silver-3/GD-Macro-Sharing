@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Macro Submission</title>
+    <link rel="stylesheet" href="/style.css">
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="form-wrapper">
+        <h1>Macro has been submitted. Go back and check discord.</h1>
+        <button type="submitAnother" id="submitAnother">Submit another</button>
+      </div>
+    </div>
+
+    <script>
+      const submitAnother = document.getElementById("submitAnother");
+
+      submitAnother.addEventListener("click", () => {
+        window.location.href = "{{link}}";
+      });
+    </script>
+
+  </body>
+</html>
