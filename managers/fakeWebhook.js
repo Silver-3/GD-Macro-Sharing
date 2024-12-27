@@ -13,6 +13,7 @@ module.exports = async (messageLog, channel, client, threadId) => {
     });
 
     if (!threadId) threadId = null;
+    if (!messageLog[2]) return;
 
     const filteredMessages = messageLog.filter(message => {
         return !message.author.bot && !message.content.toLowerCase().includes('clone');

@@ -160,5 +160,7 @@ module.exports = async (interaction, client) => {
         });
     } else if (interaction.customId === 'ticket_delete') {
         interaction.channel.delete();
+    } else if (interaction.customId == 'delete_channel') {
+        interaction.channel.delete();
     }
 }

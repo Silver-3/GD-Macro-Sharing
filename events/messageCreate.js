@@ -108,8 +108,10 @@ module.exports = {
                 if (!embed) return message.channel.send("Channel id is not a thread");
 
                 const attachment = messageArray[1].attachments.first();
+                const mention = messageArray[1].mentions.users.first();
 
                 if (!attachment) return message.channel.send("Channel id is not a thread");
+                if (!mention) return message.channel.send("Channel id is not a thread");
 
                 let fileType = attachment.name.split('.').pop();
                 if (fileType == 'json') fileType = 'gdr';
@@ -118,9 +120,12 @@ module.exports = {
                 const parts = message.channel.name.split(' | ');
                 const nameAuthor = parts[0].split(' made by ');
 
-                let user = client.users.cache.filter(user => user.username == embed.data.author.name);
-                if (user) user = user.first().id;
+                let user = client.users.cache.get(mention.id)
+                if (user) user = user.id;
                 if (!user) user = client.user.id;
+                
+                let notes = embed.data.description.toLowerCase().split('notes: ').pop().trim();
+                if (notes.startsWith(nameAuthor[0].trim().toLowerCase())) notes = "";
 
                 const macro = {
                     userID: user,
@@ -132,7 +137,7 @@ module.exports = {
                     size: (attachment.size / (1024 * 1024)).toFixed(2),
                     type: fileType,
                     noclip: parts[1].split('Noclip: ').pop().trim(),
-                    notes: embed.data.description.replace('notes', 'Notes').split('Additional Notes: ').pop().trim(),
+                    notes: notes,
                     clone: message.channel
                 }
 
@@ -142,7 +147,7 @@ module.exports = {
         } else if (message.content.includes('dev cmds')) {
             const embed = new Discord.EmbedBuilder()
                 .setTitle('Dev commands')
-                .setDescription('eval - Execute javascript code\nchange name - Change the name of the channel/thread\nclone - Clone current thread to new channel\nembed title - Create an embed\ndeletemacro id - Delete an macro with id')
+                .setDescription('eval - Execute javascript code\nchange name - Change the name of the channel/thread\nclone - Clone current thread to new channel\nembed title - Create an embed\ndeletemacro id - Delete an macro with id\ndeletechannel - Delete the current channel')
                 .setColor('Blurple')
 
             const deleteButton = new Discord.ButtonBuilder()
@@ -207,6 +212,8 @@ module.exports = {
 
             message.channel.send(`${findMatch(macros, id) ? 'Macro deleted successfully' : 'Macro not found'}`);
             Server.updateMacros(macros);
+        } else if (message.content == "deletechannel") {
+            message.channel.delete();
         }
     }
 }

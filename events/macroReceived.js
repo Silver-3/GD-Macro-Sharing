@@ -21,11 +21,13 @@ module.exports = {
         const channelId = {
             gdr: client.config.server.gdrChannelId,
             mhr: client.config.server.mhrChannelId,
+            re: client.config.server.reChannelId,
             xd: client.config.server.xdChannelId
         }
 
         if (macro.type == '.gdr' || macro.type == '.json') channel = guild.channels.cache.get(channelId.gdr);
         else if (macro.type == '.mhr') channel = guild.channels.cache.get(channelId.mhr);
+        else if (macro.type == '.re') channel = guild.channels.cache.get(channelId.re)
         else if (macro.type == '.xd') channel = guild.channels.cache.get(channelId.xd);
 
         const user = await client.users.fetch(macro.userID);
@@ -67,9 +69,24 @@ module.exports = {
                 content: `<@${user.id}>`,
                 components: [ActionRow]
             });
+            
+            const macroKey = `${user.id}-${macro.name}`;
+            
+            macros.downloads[macroKey] = {
+                userID: user.id,
+    			id: macro.id,
+    			name: macro.name,
+    			author: macro.author,
+    			originalFileName: macro.originalFileName,
+    			filePath: macro.filePath,
+    			size: macro.size,
+    			type: macro.type,
+    			noclip: macro.noclip,
+    			notes: macro.notes,
+    			link: `${client.config.url}download/${user.id}/${macro.name}`
+            }
 
-            macro.downloads[`${user.id}-${macro.name}`] = macros.uploads[`${user.id}-${macro.name}`];
-            macro.uploads = {};
+   			macros.uploads = {};
             fs.writeFileSync(macroFilePath, JSON.stringify(macros, null, 2));
         } else {
             await thread.send({ content: `<@${user.id}>`, files: [macro.filePath] });
@@ -81,7 +98,16 @@ module.exports = {
             } else {
                 const messages = await macro.clone.messages.fetch();
                 const messageArray = Array.from(messages.values()).reverse();
-
+                
+                const deleteButton = new Discord.ButtonBuilder()
+                	.setCustomId('delete_channel')
+                	.setLabel('Delete channel')
+                	.setStyle(Discord.ButtonStyle.Danger)
+                
+                const deleteActionRow = new Discord.ActionRowBuilder()
+                	.addComponents(deleteButton)
+           
+                macro.clone.send({ content: `Thread cloned to <#${thread.id}>`, components: [deleteActionRow]});
                 client.fakeWebhook(messageArray, channel, client, thread.id);
             }
         }

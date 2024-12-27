@@ -9,7 +9,7 @@
     "ws": "^8.18.0"
   },
   "name": "gd-macro-sharing",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "This bot is dedicated to assisting the GD Macro Sharing Discord Server",
   "main": "server.js",
   "devDependencies": {},

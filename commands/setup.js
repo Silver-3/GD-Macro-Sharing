@@ -8,7 +8,11 @@ const Discord = require('discord.js');
 module.exports.run = async (interaction, client) => {
     const subcommand = interaction.options.getSubcommand();
 
-    await interaction.channel.bulkDelete(5);
+    try {
+        await interaction.channel.bulkDelete(5);
+    } catch (error) {
+        console.log(`Failed to clear channel for ${subcommand}: ${error}`);
+    }
     interaction.reply({
         content: 'Clearing channel and preparing to setup...',
         ephemeral: true
@@ -46,6 +50,10 @@ module.exports.run = async (interaction, client) => {
                 .setLabel('MHR macro')
                 .setDescription('Search for a macro that is .mhr')
                 .setValue('mhr'),
+                new Discord.StringSelectMenuOptionBuilder()
+                .setLabel('RE macro')
+                .setDescription('Search for a macro that is .re')
+                .setValue('re'),
                 new Discord.StringSelectMenuOptionBuilder()
                 .setLabel('XD macro')
                 .setDescription('Search for a macro that is .xd')

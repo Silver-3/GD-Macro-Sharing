@@ -178,5 +178,5 @@ module.exports = async (interaction, client) => {
             embeds: [embed],
             ephemeral: true
         });
-    }
+    } 
 }
