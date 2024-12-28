@@ -115,6 +115,7 @@ module.exports = {
 
                 let fileType = attachment.name.split('.').pop();
                 if (fileType == 'json') fileType = 'gdr';
+                if (fileType == 're2') fileType = 're';
                 fileType = '.' + fileType;
 
                 const parts = message.channel.name.split(' | ');

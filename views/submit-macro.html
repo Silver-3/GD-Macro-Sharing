@@ -57,7 +57,7 @@
       if (fileInput.files.length > 0) {
         const fileName = fileInput.files[0].name;
         let fileType = fileName.split('.').pop();
-        const expectedFiletypes = ["gdr", "gdr.json", "mhr", "xd"];
+        const expectedFiletypes = ["gdr", "gdr.json", "re", "re2", "mhr", "xd"];
 
         if (fileName.endsWith('.gdr.json') || /\.gdr(\s*\(\d+\))?\.json$/.test(fileName)) {
           fileType = 'gdr.json';

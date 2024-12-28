@@ -27,7 +27,7 @@ module.exports = {
 
         if (macro.type == '.gdr' || macro.type == '.json') channel = guild.channels.cache.get(channelId.gdr);
         else if (macro.type == '.mhr') channel = guild.channels.cache.get(channelId.mhr);
-        else if (macro.type == '.re') channel = guild.channels.cache.get(channelId.re)
+        else if (macro.type == '.re' || macro.type == '.re2') channel = guild.channels.cache.get(channelId.re)
         else if (macro.type == '.xd') channel = guild.channels.cache.get(channelId.xd);
 
         const user = await client.users.fetch(macro.userID);
@@ -114,6 +114,7 @@ module.exports = {
 
         let macroType = macro.type.replace('.', '');
         if (macroType == 'json') macroType = 'gdr';
+        if (macroType == 're2') macroType = 're';
 
         const macroObject = {
             name: macro.name,

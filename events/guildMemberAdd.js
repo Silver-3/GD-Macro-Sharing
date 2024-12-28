@@ -7,9 +7,7 @@ module.exports = {
      * @param {Discord.Client} client 
      * @param {Discord.GuildMember} member
      */
-    run: async (member, client) => {
-        if (member.guild.id !== client.config.server.serverId) return; // REMOVE ME LATER
-        
+    run: async (member, client) => {        
         const welcomeChannel = member.guild.channels.cache.get(client.config.server.welcomeChannelId);
 
         const embed = new Discord.EmbedBuilder()
