@@ -124,7 +124,7 @@ module.exports = (client) => {
 
   app.get("/download/:userID/:macroName", (req, res) => {
     const userID = req.params.userID;
-    const macroName = req.params.macroNamel;
+    const macroName = req.params.macroName;
 
     const macroKey = `${userID}-${macroName}`;
     const macro = macros.downloads[macroKey];
