@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
 const path = require('path');
 const fs = require('fs');
-const Server = require('../server.js');
+const Server = require('../dashboard/server.js');
 
 const macroFilePath = path.join(__dirname, '../macros.json');
 const loadMacros = () => JSON.parse(fs.readFileSync(macroFilePath, 'utf8'));

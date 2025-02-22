@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GD Macro Sharing</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+  <div class="icon-text">
+    <img alt="Icon" id="avatar" class="avatar">
+    <span id="username" class="username"></span>
+  </div>
+
+  <div class="container">
+    <form action="/submit-macro" method="POST" enctype="multipart/form-data">
+      <h1>Submit Macro</h1>
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" required>
+      </div>
+      <div class="form-group">
+        <label for="author">Author</label>
+        <input type="text" id="author" name="author" required>
+      </div>
+      <div class="form-group">
+        <label for="id">ID</label>
+        <input type="number" id="id" name="id" required>
+      </div>
+      <div class="form-group checkbox-group">
+        <label for="noclip">Noclip</label>
+        <input type="checkbox" id="noclip" name="noclip">
+      </div>
+      <div class="form-group">
+        <label for="notes">Notes</label>
+        <input type="text" id="notes" name="notes">
+      </div>
+      <div class="form-group">
+        <label>Upload Macro</label>
+        <input type="file" id="macroFile" name="macroFile" required>
+        <div class="characterLimit" id="characterLimit"></div>
+        <div class="fileType" id="fileType"></div>
+      </div>
+      <div class="form-group">
+        <button type="submit" id="submitButton">Submit</button>
+      </div>
+    </form>
+  </div>
+  <script src="/js/submit-macro.js"></script>
+</body>
+
+</html>

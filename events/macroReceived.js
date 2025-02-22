@@ -4,7 +4,7 @@ const fs = require('fs');
 
 const macroFilePath = path.join(__dirname, '../macros.json');
 const loadMacros = () => JSON.parse(fs.readFileSync(macroFilePath, 'utf8'));
-const server = require('../server.js');
+const server = require('../dashboard/server.js');
 
 module.exports = {
     name: 'macroReceived',

@@ -1,5 +1,4 @@
 const Discord = require('discord.js');
-const requestUsers = {};
 
 /**
  * @param {Discord.Interaction} interaction
@@ -7,20 +6,7 @@ const requestUsers = {};
  */
 
 module.exports = async (interaction, client) => {
-    if (interaction.customId === 'submit') {
-        const submitButton = new Discord.ButtonBuilder()
-            .setLabel('Upload a macro')
-            .setStyle(Discord.ButtonStyle.Link)
-            .setURL(client.config.url + 'submit-macro?userID=' + interaction.user.id);
-
-        const submitActionRow = new Discord.ActionRowBuilder()
-            .addComponents(submitButton)
-
-        interaction.reply({
-            components: [submitActionRow],
-            ephemeral: true
-        });
-    } else if (interaction.customId === 'delete_eval' || interaction.customId === 'delete') {
+    if (interaction.customId === 'delete_eval' || interaction.customId === 'delete') {
         if (interaction.user.id === client.config.devId) interaction.message.delete();
     } else if (interaction.customId == 'code_eval') {
         if (interaction.user.id === client.config.devId) {
@@ -50,19 +36,19 @@ module.exports = async (interaction, client) => {
             interaction.member.roles.remove(role.id);
             interaction.reply({
                 content: `You have been removed from the <@&${role.id}> role.`,
-                ephemeral: true
+                flags: Discord.MessageFlags.Ephemeral
             });
         } else {
             interaction.member.roles.add(role.id);
             interaction.reply({
                 content: `You have been given the <@&${role.id}> role.`,
-                ephemeral: true
+                flags: Discord.MessageFlags.Ephemeral
             });
         }
     } else if (interaction.customId === 'ticket_open') {
         if (interaction.guild.channels.cache.find(c => c.name === `ticket-${interaction.user.id}`)) return interaction.reply({
             content: `You already have an open ticket: <#${interaction.guild.channels.cache.find(c => c.name === `ticket-${interaction.user.id}`).id}>`,
-            ephemeral: true
+            flags: Discord.MessageFlags.Ephemeral
         });
 
         const channel = await interaction.guild.channels.create({
@@ -99,7 +85,7 @@ module.exports = async (interaction, client) => {
 
         interaction.reply({
             content: `Ticket created <#${channel.id}>`,
-            ephemeral: true
+            flags: Discord.MessageFlags.Ephemeral
         });
 
         channel.send({

@@ -15,19 +15,19 @@ module.exports.run = async (interaction, client) => {
     }
     interaction.reply({
         content: 'Clearing channel and preparing to setup...',
-        ephemeral: true
+        flags: Discord.MessageFlags.Ephemeral
     });
 
     if (subcommand == 'macros') {
         const submitEmbed = new Discord.EmbedBuilder()
-            .setTitle('Click below to get a link to submit a macro')
+            .setTitle('Click below to submit a macro')
             .setDescription(`\n\n-# If you need help, please DM <@${client.config.devId}>`)
             .setColor('Blurple')
 
         const submitButton = new Discord.ButtonBuilder()
-            .setLabel('Get Link')
-            .setStyle(Discord.ButtonStyle.Success)
-            .setCustomId('submit')
+            .setLabel('Submit a macro')
+            .setStyle(Discord.ButtonStyle.Link)
+            .setURL(client.config.url);
 
         const submitActionRow = new Discord.ActionRowBuilder()
             .addComponents(submitButton)
@@ -42,6 +42,10 @@ module.exports.run = async (interaction, client) => {
             .setPlaceholder('Select a macro file type')
             .setMaxValues(1)
             .addOptions(
+                new Discord.StringSelectMenuOptionBuilder()
+                .setLabel('Any format')
+                .setDescription('Search for a macro that is any format')
+                .setValue('any'),
                 new Discord.StringSelectMenuOptionBuilder()
                 .setLabel('GDR macro')
                 .setDescription('Search for a macro that is .gdr or .gdr.json')

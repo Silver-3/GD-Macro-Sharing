@@ -128,8 +128,15 @@ module.exports = async (interaction, client) => {
         }
     } else if (interaction.customId.startsWith('search_modal')) {
         const levelName = interaction.fields.getTextInputValue('search_modal_input');
-        const macroType = interaction.customId.replace('search_modal_', '');
-        let macros = JSON.parse(fs.readFileSync(macrosFilePath, 'utf8')).stored[macroType];
+        let macroType = interaction.customId.replace('search_modal_', '');
+        let macros;
+
+        if (macroType == 'any') {
+            macros = Object.values(JSON.parse(fs.readFileSync(macrosFilePath, 'utf8')).stored).flat();
+            macroType = 'any format';
+        } else {
+            macros = JSON.parse(fs.readFileSync(macrosFilePath, 'utf8')).stored[macroType];
+        }
 
         if (!macros) macros = [];
         const fullNameMatches = [];
@@ -144,30 +151,46 @@ module.exports = async (interaction, client) => {
                         if (!partialMatches[word]) partialMatches[word] = [];
                         partialMatches[word].push(macro);
                     }
-                })
+                });
             }
         });
 
-        let message = "";
+        let messages = [];
+        let currentMessage = "";
 
         if (fullNameMatches.length > 0) {
-            message += `Macros matching \`${levelName}\`:\n\n${fullNameMatches.map(macro => `<#${macro.channelId}>`).join('\n')}\n\n`;
+            currentMessage += `Macros matching \`${levelName}\`:\n\n`;
+            
+            fullNameMatches.forEach(match => {
+                if (currentMessage.length + `<#${match.channelId}>\n`.length > 4096) {
+                    messages.push(currentMessage);
+                    currentMessage = "";
+                }
+                currentMessage += `<#${match.channelId}>\n`;
+            })
         }
 
-        levelName.split(' ').forEach(word => {
-            if (partialMatches[word] && partialMatches[word].length > 0) {
-                message += `Macros matching \`${word}\`:\n\n${partialMatches[word].map(macro => `<#${macro.channelId}>`).join('\n')}\n\n`;
+        Object.keys(partialMatches).forEach(word => {
+            if (partialMatches[word].length > 0) {
+                currentMessage += `Macros matching \`${word}\`:\n\n`;
+
+                partialMatches[word].forEach(match => {
+                    if (currentMessage.length + `<#${match.channelId}>\n`.length > 4096) {
+                        messages.push(currentMessage);
+                        currentMessage = "";
+                    } 
+                    currentMessage += `<#${match.channelId}>\n`;
+                });
             }
         });
 
-        if (!message) {
-            message = `No macros found matching \`${levelName}\` in the \`${macroType}\` macros.`;
+        if (currentMessage.length > 0) {
+            messages.push(currentMessage);
+        } else if (messages.length === 0) {
+            messages.push(`No macros found matching \`${levelName}\` in \`${macroType}\` macros.`);
         }
 
-        const embed = new Discord.EmbedBuilder()
-            .setDescription(message)
-            .setColor('Blurple')
-            .setTitle('Search Results')
+        const embeds = messages.map(msg => new Discord.EmbedBuilder().setDescription(msg).setColor('Blurple').setTitle('Search Results'));
 
         interaction.message.edit({
             embeds: [interaction.message.embeds[0]],
@@ -175,8 +198,8 @@ module.exports = async (interaction, client) => {
         });
 
         interaction.reply({
-            embeds: [embed],
-            ephemeral: true
+            embeds: embeds,
+            flags: Discord.MessageFlags.Ephemeral,
         });
-    } 
+    }
 }
