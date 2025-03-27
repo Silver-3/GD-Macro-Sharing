@@ -18,6 +18,11 @@ module.exports.run = async (interaction, client) => {
         flags: Discord.MessageFlags.Ephemeral
     });
 
+    const pingForError = new Discord.EmbedBuilder()
+        .setTitle('If you have issues')
+        .setDescription(`If the bot or the website is offline or has problems then ping <@${client.config.devId}> in <#1216316500130926633>\n`)
+        .setColor('Blurple')
+
     if (subcommand == 'macros') {
         const submitEmbed = new Discord.EmbedBuilder()
             .setTitle('Click below to submit a macro')
@@ -32,6 +37,15 @@ module.exports.run = async (interaction, client) => {
         const submitActionRow = new Discord.ActionRowBuilder()
             .addComponents(submitButton)
 
+        interaction.channel.send({
+            embeds: [submitEmbed],
+            components: [submitActionRow]
+        });
+        interaction.channel.send('_ _');
+        interaction.channel.send({
+            embeds: [pingForError]
+        });
+    } else if (subcommand == 'searchmacros') {
         const searchEmbed = new Discord.EmbedBuilder()
             .setTitle('Click below to search for a macro')
             .setDescription(`\n\n-# If you need help, please DM <@${client.config.devId}>`)
@@ -68,15 +82,15 @@ module.exports.run = async (interaction, client) => {
             .addComponents(searchSelectMenu)
 
         interaction.channel.send({
-            embeds: [submitEmbed],
-            components: [submitActionRow]
-        });
-        interaction.channel.send('_ _');
-        interaction.channel.send({
             embeds: [searchEmbed],
             components: [searchActionRow]
         });
-    } else if (subcommand == 'rules') {
+        interaction.channel.send('_ _');
+        interaction.channel.send({
+            embeds: [pingForError]
+        });
+    }
+    else if (subcommand == 'rules') {
         const rulesEmbed = new Discord.EmbedBuilder()
             .setTitle('Rules')
             .setDescription('1. No NSFW content\n2. No offensive or harmful content\n3. Use designated channels\n4. Avoid spam\n5. Use common sense')
@@ -138,6 +152,9 @@ module.exports.data = new SlashCommand()
     .addSubcommand(subcommand => subcommand
         .setName('macros')
         .setDescription('Setup macro submittion'))
+    .addSubcommand(subcommand => subcommand
+        .setName('searchmacros')
+        .setDescription('Setup search macros'))
     .addSubcommand(subcommand => subcommand
         .setName('rules')
         .setDescription('Setup rules'))
