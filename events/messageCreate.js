@@ -194,7 +194,6 @@ module.exports = {
                 msg.delete();
             });
         } else if (message.content.startsWith('deletemacro')) {
-            const id = message.content.slice(12);
             const macros = loadMacros();
 
             function findMatch(data, searchId) {
@@ -211,8 +210,33 @@ module.exports = {
                 return false
             }
 
-            message.channel.send(`${findMatch(macros, id) ? 'Macro deleted successfully' : 'Macro not found'}`);
-            Server.updateMacros(macros);
+            const msg = await message.channel.send('Are you sure you want to delete this macro? yes/no');
+            const collector = await message.channel.createMessageCollector({
+                filter: m => m.author.id === message.author.id,
+                time: 60000,
+                max: 1
+            });
+
+            collector.on('collect', async (m) => {
+                if (m.content.toLowerCase() == 'yes') {
+                    findMatch(macros, message.channel.id);
+                    Server.updateMacros(macros);
+                    message.channel.delete();
+                } else {
+                    const embed = new Discord.EmbedBuilder()
+                        .setColor('Blurple')
+                        .setDescription('Macro deletetion cancelled')
+
+                    const r = await message.channel.send({ embeds: [embed]});
+
+                    setTimeout(() => {
+                        message.delete();
+                        msg.delete();
+                        m.delete();
+                        r.delete();
+                    }, 10000);
+                }
+            });
         } else if (message.content == "deletechannel") {
             message.channel.delete();
         }

@@ -3,6 +3,7 @@ logs/
 macros/
 config.json
 package-lock.json
+macros.json
 *.sqlite
 *.bat
 *.txt

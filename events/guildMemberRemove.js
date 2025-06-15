@@ -15,8 +15,12 @@ module.exports = {
             .setDescription(`<@${member.id}> left ${member.guild.name}`)
             .setColor('Red')
 
-        welcomeChannel.send({
-            embeds: [embed]
-        });
+        try {
+            welcomeChannel.send({
+            	embeds: [embed]
+       		 });
+        } catch (error) {
+            console.log('Failed to send leave message: ' + error)
+        }
     }
 }
