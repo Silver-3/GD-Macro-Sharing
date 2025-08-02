@@ -100,7 +100,7 @@ module.exports.run = async (interaction, client) => {
             embeds: [rulesEmbed]
         });
 
-        interaction.channel.send("__**Invite link for this server**__\n" + client.config.server.invite)
+        interaction.channel.send("__**Invite link for this server**__\n" + client.config.invite)
     } else if (subcommand == 'self-roles') {
         const selfRolesEmbed = new Discord.EmbedBuilder()
             .setTitle('Self Roles')

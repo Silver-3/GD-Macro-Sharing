@@ -8,7 +8,7 @@ module.exports = {
      * @param {Discord.GuildMember} member
      */
     run: async (member, client) => {        
-        const welcomeChannel = member.guild.channels.cache.get(client.config.server.welcomeChannelId);
+        const welcomeChannel = member.guild.channels.cache.get(client.config.welcomeChannel);
 
         const embed = new Discord.EmbedBuilder()
             .setTitle('Member Joined')
@@ -19,6 +19,6 @@ module.exports = {
             embeds: [embed]
         });
 
-        member.roles.add(client.config.server.memberRole);
+        member.roles.add(client.config.memberRole);
     }
 }

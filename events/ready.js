@@ -93,7 +93,7 @@ module.exports = {
         }
 
         console.log(`[BOT] Bot is online.`);
-        client.user.setActivity(`over ${client.guilds.cache.get(client.config.server.serverId).name}`, {
+        client.user.setActivity(`over ${client.guilds.cache.get(client.config.server).name}`, {
             type: Discord.ActivityType.Watching
         });
 
@@ -106,6 +106,7 @@ module.exports = {
         loadCommands().then(() => {
             console.log(`[INFO] Slash Commands have loaded.`);
         });
+        
 
         if (client.config.sendLogs == true) {
             setInterval(() => {

@@ -3,7 +3,11 @@ const bodyParser = require("body-parser");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
-const config = require("../config.json");
+
+const botConfig = require('../config/bot.js');
+const idConfig = require('../config/ids.js');
+const linkConfig = require('../config/links.js');
+const config = { ...botConfig, ...idConfig, ...linkConfig };
 
 const app = express();
 const port = config.url.split(':').pop().replace('/', '');

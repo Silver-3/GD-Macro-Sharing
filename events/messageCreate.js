@@ -100,7 +100,6 @@ module.exports = {
                 }
 
             } else {
-                // clone current thread to new channel
                 const messages = await message.channel.messages.fetch();
                 const messageArray = Array.from(messages.values()).reverse();
 

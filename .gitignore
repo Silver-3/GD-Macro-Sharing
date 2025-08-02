@@ -1,6 +1,8 @@
 node_modules/
 logs/
 macros/
+config/
+backup/
 config.json
 package-lock.json
 macros.json

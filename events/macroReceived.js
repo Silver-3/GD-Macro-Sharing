@@ -14,15 +14,15 @@ module.exports = {
      * @param {Object} macro
      */
     run: async (macro, client) => {
-        const guild = client.guilds.cache.get(client.config.server.serverId);
+        const guild = client.guilds.cache.get(client.config.server);
         const macros = loadMacros();
 
         let channel;
         const channelId = {
-            gdr: client.config.server.gdrChannelId,
-            mhr: client.config.server.mhrChannelId,
-            re: client.config.server.reChannelId,
-            xd: client.config.server.xdChannelId
+            gdr: client.config.gdrChannel,
+            mhr: client.config.mhrChannel,
+            re: client.config.reChannel,
+            xd: client.config.xdChannel
         }
 
         if (macro.type == '.gdr' || macro.type == '.json') channel = guild.channels.cache.get(channelId.gdr);
@@ -118,7 +118,8 @@ module.exports = {
 
         const macroObject = {
             name: macro.name,
-            channelId: thread.id
+            channelId: thread.id,
+            userID: user.id
         }
 
         if (!macros.stored[macroType]) macros.stored[macroType] = [];

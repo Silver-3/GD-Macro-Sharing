@@ -1,17 +1,20 @@
 const Discord = require('discord.js');
-const config = require('./config.json');
 const dashboard = require('./dashboard/server.js');
+
+const botConfig = require('./config/bot.js');
+const idConfig = require('./config/ids.js');
+const linkConfig = require('./config/links.js');
 
 const client = new Discord.Client({
     intents: Object.keys(Discord.GatewayIntentBits).map((intent) => Discord.GatewayIntentBits[intent]),
 });
 
 client.commands = new Discord.Collection();
-client.config = config;
+client.config = { ...botConfig, ...idConfig, ...linkConfig };
 client.preLoginLogQueue = [];
 client.fakeWebhook = require('./managers/fakeWebhook.js');
 
-if (config.sendLogs == true) {
+if (botConfig.sendLogs == true) {
     const originalConsoleLog = console.log;
 
     console.log = function (message) {
@@ -25,20 +28,12 @@ if (config.sendLogs == true) {
 });
 
 dashboard(client);
-client.login(config.token);
+client.login(botConfig.token);
 
 process.on("uncaughtException", (err) => {
-    console.log("[ERROR] Uncaught Exception:", err);
+    console.log("[ERROR] Caugh Uncaught Exception: ", err);
 });
 
 process.on("unhandledRejection", (reason, promise) => {
-    console.log("[ERROR] Unhandled Rejection at:", promise, "reason:", reason);
-});
-
-process.on("SIGINT", () => {
-    console.log("[ERROR] Caught SIGINT, preventing shutdown...");
-});
-
-process.on("SIGTERM", () => {
-    console.log("[ERROR] Caught SIGTERM, preventing shutdown...");
+    console.log("[ERROR] Caught Unhandled Rejection: ", reason);
 });
