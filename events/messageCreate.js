@@ -15,6 +15,44 @@ module.exports = {
      */
     run: async (message, client) => {
         if (!message.guild || message.author.bot) return;
+
+        const linkRegex = /https?:\/\/[^ ]*\.discordapp\.[^ ]*\.(?:jpg|jpeg|png|gif|webp)(?:\?[^ ]*)?/gi;
+        const matches = message.content.match(linkRegex);
+
+        if (matches && matches.length >= 3) {
+            try {
+                await message.delete();
+
+                const member = await message.guild.members.fetch(message.author.id);
+                await member.timeout(10 * 60 * 1000, "Possible scam");
+
+                const channel = await message.guild.channels.fetch(client.config.automodChannel);
+                const automodEmbed = new Discord.EmbedBuilder()
+                    .setAuthor({ name: member.user.username, iconURL: member.displayAvatarURL()})
+                    .setDescription(message.content)
+                    .setFooter({text: `3 or more links sent • Possible scam • 10 min timeout`})
+
+                channel.send({
+                    content: `Blocked a message in <#${message.channel.id}> `,
+                    embeds: [automodEmbed]
+                });
+
+                const guild = client.guilds.cache.get(client.config.server);
+                const userEmbed = new Discord.EmbedBuilder()
+                    .setDescription(`Hello <@${member.user.id}>, your account may have been **compromised**.\nYou sent **3 or more image links**, which is currently a common sign of a current scam.\n\nIf this was **you** and **not** a virus, please DM me <@${client.config.devId}> so i can untimeout you.\nHere's what you should do to stay safe if it **was not you**:\n\n• **Change your password** immediately\n• Run a **full antivirus scan** (I recommend MalwareBytes or Windows)\n• Consider a **windows reset** if you suspect malware\n• Be cautious with unknown links, files or game cheats\n\nStay safe and always do your research on random unknown downloads before opening and installing them.`)
+                    .setColor('Blurple')
+                    .setFooter({text: `Sent from ${guild.name}`, iconURL: guild.iconURL()})
+
+                member.send({
+                    embeds: [userEmbed]
+                });
+            } catch (error) {
+                const fileName = path.basename(__filename);
+                console.log(`${error.name}\noccurred: ${fileName} in function scam automod\n${error.stack}`);
+            }
+        }
+
+
         if (message.author.id !== client.config.devId) return;
 
         if (message.content.includes('eval')) {
@@ -238,6 +276,6 @@ module.exports = {
             });
         } else if (message.content == "deletechannel") {
             message.channel.delete();
-        }
+        } 
     }
 }
