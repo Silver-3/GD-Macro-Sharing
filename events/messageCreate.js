@@ -39,7 +39,7 @@ module.exports = {
 
                 const guild = client.guilds.cache.get(client.config.server);
                 const userEmbed = new Discord.EmbedBuilder()
-                    .setDescription(`Hello <@${member.user.id}>, your account may have been **compromised**.\nYou sent **3 or more image links**, which is currently a common sign of a current scam.\n\nIf this was **you** and **not** a virus, please DM me <@${client.config.devId}> so i can untimeout you.\nHere's what you should do to stay safe if it **was not you**:\n\n• **Change your password** immediately\n• Run a **full antivirus scan** (I recommend MalwareBytes or Windows)\n• Consider a **windows reset** if you suspect malware\n• Be cautious with unknown links, files or game cheats\n\nStay safe and always do your research on random unknown downloads before opening and installing them.`)
+                    .setDescription(`Hello <@${member.user.id}>, your account may have been **compromised**.\nYou sent **3 or more image links**, which is currently a common sign of a current scam.\n\nIf this was **you** and **not** a virus, please DM me <@${client.config.devId}> so i can untimeout you.\nHere's what you should do to stay safe if it **was not you**:\n\n• **Change your password** immediately\n• Run a **full antivirus scan** (I recommend MalwareBytes or Windows)\n• Consider a **windows reset** if you suspect malware\n• Be cautious with unknown links, files or game cheats\n\nStay safe and always do your research on random unknown downloads before opening and installing them. You can also DM me <@${client.config.devId}> if you need help.`)
                     .setColor('Blurple')
                     .setFooter({text: `Sent from ${guild.name}`, iconURL: guild.iconURL()})
 
