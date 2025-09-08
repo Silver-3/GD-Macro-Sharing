@@ -15,8 +15,9 @@ module.exports = {
      */
     run: async (message, client) => {
         if (!message.guild || message.author.bot) return;
-
+        
         const linkRegex = /https?:\/\/[^ ]*\.discordapp\.[^ ]*\.(?:jpg|jpeg|png|gif|webp)(?:\?[^ ]*)?/gi;
+;
         const matches = message.content.match(linkRegex);
 
         if (matches && matches.length >= 3) {
@@ -51,8 +52,7 @@ module.exports = {
                 console.log(`${error.name}\noccurred: ${fileName} in function scam automod\n${error.stack}`);
             }
         }
-
-
+        
         if (message.author.id !== client.config.devId) return;
 
         if (message.content.includes('eval')) {
@@ -276,6 +276,6 @@ module.exports = {
             });
         } else if (message.content == "deletechannel") {
             message.channel.delete();
-        } 
+        }
     }
 }
