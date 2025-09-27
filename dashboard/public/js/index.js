@@ -14,7 +14,7 @@ window.onload = () => {
     const login = document.getElementById("login");
 
     login.addEventListener("click", () => {
-      window.location.href = "https://discord.com/oauth2/authorize?client_id=1383593364582174790&response_type=token&redirect_uri=http%3A%2F%2Fus-nyc-01.wisp.uno%3A8470%2Fauth&scope=identify";
+      window.location.href = "https://discord.com/oauth2/authorize?client_id=1383593364582174790&response_type=token&redirect_uri=http%3A%2F%2F45.61.162.33%3A8470%2Fauth&scope=identify";
     });
 
     const userId = getCookie("userId");
