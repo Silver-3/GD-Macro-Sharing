@@ -12,20 +12,26 @@ module.exports.run = async (interaction, client) => {
     const sorted = messages.sort((a, b) => a.id - b.id);
     const message = sorted.at(1);
 
-    const url = message.components[0].components[0].data.url;
-    const formatUrl = new URL(url).pathname.slice(1);
+    let formatUrl;
 
-    const row = new Discord.ActionRowBuilder().addComponents(
+    try {
+        const url = message.components[0].components[0].data.url;
+        formatUrl = new URL(url).pathname.slice(1);
+
+        const row = new Discord.ActionRowBuilder().addComponents(
         new Discord.ButtonBuilder()
             .setLabel("Download Macro (above 10mb)")
             .setStyle(Discord.ButtonStyle.Link)
             .setURL(`${client.config.url}${formatUrl}`)
         );
 
-    interaction.editReply({ 
-        content: "Here is the updated button", 
-        components: [row] 
-    });
+        interaction.editReply({ 
+            content: "Here is the updated button", 
+            components: [row] 
+        });
+    } catch (error) {
+        interaction.editReply("Button was not found, please use this in a channel with a 'Download Macro' button")
+    }
 }
 
 module.exports.data = new SlashCommand()
