@@ -2,7 +2,7 @@ const SlashCommand = require('@discordjs/builders').SlashCommandBuilder;
 const Discord = require('discord.js');
 const fs = require('fs');
 
-async function tallyMacros(client) {
+async function tallyMacros() {
     const raw = await fs.readFileSync('./macros.json', 'utf-8');
     const macros = JSON.parse(raw);
 
@@ -27,7 +27,7 @@ async function tallyMacros(client) {
     return counts;
 }
 
-async function makeLeaderboard(counts, client) {
+async function makeLeaderboard(counts, client, sender) {
     const sorted = [...counts.entries()]
         .sort(([,a],[,b]) => b - a)
         .slice(0, 10);
@@ -37,7 +37,11 @@ async function makeLeaderboard(counts, client) {
         let name = `#${i + 1}`;
         try {
             const user = await client.users.fetch(userID);
-            name = `#${i + 1} • ${user.tag}`;
+            if (user.id == sender.id) {
+                name = `#${i + 1} • ${user.globalName ? user.globalName : user.username} <-- You`;
+            } else {
+                name = `#${i + 1} • ${user.globalName ? user.globalName : user.username} `;
+            }
         } catch {};
         
         return {
@@ -51,7 +55,7 @@ async function makeLeaderboard(counts, client) {
         .setTitle('Macro upload Leaderboard')
         .addFields(fields)
         .setColor('Blurple')
-        .setFooter({text: `Total macros uploaded by this server: ${totalMacros}`})
+        .setFooter({text: `Total macros uploaded in this server: ${totalMacros}`})
 }
 
 /**
@@ -62,8 +66,8 @@ module.exports.run = async (interaction, client) => {
     await interaction.deferReply();
 
     try {
-        const counts = await tallyMacros(client);
-        const embed = await makeLeaderboard(counts, client);
+        const counts = await tallyMacros();
+        const embed = await makeLeaderboard(counts, client, interaction.user);
 
         await interaction.editReply({
             embeds: [embed]
