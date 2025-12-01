@@ -32,55 +32,29 @@ module.exports.run = async (interaction, client) => {
         const submitButton = new Discord.ButtonBuilder()
             .setLabel('Submit a macro')
             .setStyle(Discord.ButtonStyle.Link)
-            .setURL(client.config.url);
+            .setURL(client.config.url + 'submit-macro');
 
         const submitActionRow = new Discord.ActionRowBuilder()
             .addComponents(submitButton)
+
+        const searchEmbed = new Discord.EmbedBuilder()
+            .setTitle('Click below to search for a macro')
+            .setDescription(`Shouldn't need an explanation, just type in to search`)
+            .setColor('Blurple')
+
+        const searchButton = new Discord.ButtonBuilder()
+            .setLabel('Browse Macros')
+            .setStyle(Discord.ButtonStyle.Link)
+            .setURL(client.config.url + 'browse-macros');
+
+        const searchActionRow = new Discord.ActionRowBuilder()
+            .addComponents(searchButton)
 
         interaction.channel.send({
             embeds: [submitEmbed],
             components: [submitActionRow]
         });
         interaction.channel.send('_ _');
-        interaction.channel.send({
-            embeds: [pingForError]
-        });
-    } else if (subcommand == 'searchmacros') {
-        const searchEmbed = new Discord.EmbedBuilder()
-            .setTitle('Click below to search for a macro')
-            .setDescription(`\n\n-# If you need help, please DM <@${client.config.devId}>`)
-            .setColor('Blurple')
-
-        const searchSelectMenu = new Discord.StringSelectMenuBuilder()
-            .setCustomId('search')
-            .setPlaceholder('Select a macro file type')
-            .setMaxValues(1)
-            .addOptions(
-                new Discord.StringSelectMenuOptionBuilder()
-                .setLabel('Any format')
-                .setDescription('Search for a macro that is any format')
-                .setValue('any'),
-                new Discord.StringSelectMenuOptionBuilder()
-                .setLabel('GDR macro')
-                .setDescription('Search for a macro that is .gdr or .gdr.json')
-                .setValue('gdr'),
-                new Discord.StringSelectMenuOptionBuilder()
-                .setLabel('MHR macro')
-                .setDescription('Search for a macro that is .mhr')
-                .setValue('mhr'),
-                new Discord.StringSelectMenuOptionBuilder()
-                .setLabel('RE macro')
-                .setDescription('Search for a macro that is .re or .re2')
-                .setValue('re'),
-                new Discord.StringSelectMenuOptionBuilder()
-                .setLabel('XD macro')
-                .setDescription('Search for a macro that is .xd')
-                .setValue('xd'),
-            )
-
-        const searchActionRow = new Discord.ActionRowBuilder()
-            .addComponents(searchSelectMenu)
-
         interaction.channel.send({
             embeds: [searchEmbed],
             components: [searchActionRow]
@@ -89,8 +63,7 @@ module.exports.run = async (interaction, client) => {
         interaction.channel.send({
             embeds: [pingForError]
         });
-    }
-    else if (subcommand == 'rules') {
+    } else if (subcommand == 'rules') {
         const rulesEmbed = new Discord.EmbedBuilder()
             .setTitle('Rules')
             .setDescription('1. No NSFW content\n2. No offensive or harmful content\n3. Use designated channels\n4. Avoid spam\n5. Use common sense')

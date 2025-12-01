@@ -1,27 +1,17 @@
 const SlashCommand = require('@discordjs/builders').SlashCommandBuilder;
 const Discord = require('discord.js');
-const fs = require('fs');
+const db = require('../managers/database.js');
 
 async function tallyMacros() {
-    const raw = await fs.readFileSync('./macros.json', 'utf-8');
-    const macros = JSON.parse(raw);
+    const rows = await db.all();
 
     const counts = new Map();
-    function bump(userID) {
-        counts.set(userID, (counts.get(userID) || 0) + 1);
-    }
 
-    for (const key of Object.keys(macros.downloads)) {
-        const uid = macros.downloads[key].userID;
-        if (uid) bump(uid);
-    }
+    for (const row of rows) {
+        const uid = row.userId;
+        if (!uid) continue;
 
-    for (const category of Object.values(macros.stored)) {
-        for (const entry of category) {
-            if (entry.userID) {
-                bump(entry.userID);
-            }
-        }
+        counts.set(uid, (counts.get(uid) || 0) + 1);
     }
 
     return counts;

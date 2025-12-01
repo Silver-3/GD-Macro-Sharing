@@ -2,9 +2,11 @@
 <html lang="en">
 
 <head>
+    <title>Macro Submitted</title>
+    <link rel="icon" href="/assets/logo.ico" type="image/x-icon">
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GD Macro Sharing</title>
   <link rel="stylesheet" href="/style.css">
 </head>
 
@@ -16,13 +18,28 @@
     </div>
   </div>
 
-  <script>
-    const submitAnother = document.getElementById("submitAnother");
+  <nav class="topbar">
+    <div class="left">
+      <a href="/" class="logo">Home</a>
+      <a href="/submit-macro">Submit Macro</a>
+      <a href="/browse-macros">Browse Macros</a>
+    </div>
 
-    submitAnother.addEventListener("click", () => {
-      window.location.href = "/submit-macro";
-    });
-  </script>
+    <div class="right">
+      <span id="username" class="username"></span>
+      <img class="avatar" id="avatar">
+    </div>
+  </nav>
+
+  <div id="loginModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <p>You must log in to submit a macro</p>
+      <button id="loginButton">Sign In</button>
+      <button id="returnButton" class="returnButton">Go Back</button>
+    </div>
+  </div>
+
+  <script src="/js/macro-submitted.js"></script>
 </body>
 
 </html>

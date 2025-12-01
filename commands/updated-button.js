@@ -8,21 +8,12 @@ const Discord = require('discord.js');
 module.exports.run = async (interaction, client) => {
     await interaction.deferReply();
 
-    const messages = await interaction.channel.messages.fetch({ after: "0", limit: 2 });
-    const sorted = messages.sort((a, b) => a.id - b.id);
-    const message = sorted.at(1);
-
-    let formatUrl;
-
     try {
-        const url = message.components[0].components[0].data.url;
-        formatUrl = new URL(url).pathname.slice(1);
-
         const row = new Discord.ActionRowBuilder().addComponents(
         new Discord.ButtonBuilder()
             .setLabel("Download Macro (above 10mb)")
             .setStyle(Discord.ButtonStyle.Link)
-            .setURL(`${client.config.url}${formatUrl}`)
+            .setURL(`${client.config.url}download/${interaction.channel.id}/download`)
         );
 
         interaction.editReply({ 

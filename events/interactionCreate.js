@@ -20,7 +20,6 @@ module.exports = {
         }
 
         if (interaction.isButton()) return require('../managers/buttonManager.js')(interaction, client);
-        if (interaction.isStringSelectMenu()) return require('../managers/selectMenuManager.js')(interaction, client);
         if (interaction.isModalSubmit()) return require('../managers/modalManager.js')(interaction, client);
         if (!interaction.isCommand()) return;
 

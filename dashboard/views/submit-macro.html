@@ -2,52 +2,86 @@
 <html lang="en">
 
 <head>
+  <title>Submit Macro</title>
+  <link rel="icon" href="/assets/logo.ico" type="image/x-icon">
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GD Macro Sharing</title>
   <link rel="stylesheet" href="/style.css">
 </head>
 
 <body>
-  <div class="icon-text">
-    <img alt="Icon" id="avatar" class="avatar">
-    <span id="username" class="username"></span>
+  <nav class="topbar">
+    <div class="left">
+      <a href="/" class="logo">Home</a>
+      <a href="/submit-macro">Submit Macro</a>
+      <a href="/browse-macros">Browse Macros</a>
+    </div>
+
+    <div class="right">
+      <span id="username" class="username"></span>
+      <img class="avatar" id="avatar">
+    </div>
+  </nav>
+
+  <div id="loginModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <p>You must log in to submit a macro</p>
+      <button id="loginButton">Sign In</button>
+      <button id="returnButton" class="returnButton">Go Back</button>
+    </div>
   </div>
 
   <div class="container">
-    <form action="/submit-macro" method="POST" enctype="multipart/form-data">
-      <h1>Submit Macro</h1>
-      <div class="form-group">
-        <label for="name">Level Name</label>
-        <input type="text" id="name" name="name" required>
+    <form id="macroForm" class="form-wrapper" action="/submit-macro" method="POST" enctype="multipart/form-data">
+      <div id="step1">
+        <h1>Submit Macro</h1>
+        <div class="form-group">
+          <label for="id">Level ID</label>
+          <input type="number" id="id" name="id" required>
+        </div>
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" id="name" name="name" readonly class="readonly-like-disabled" placeholder="Enter ID first">
+        </div>
+        <div class="form-group">
+          <label for="author">Author</label>
+          <input type="text" id="author" name="author" readonly class="readonly-like-disabled"
+            placeholder="Enter ID first">
+        </div>
+        <div class="form-group">
+          <button type="button" id="nextButton" disabled>Next</button>
+        </div>
       </div>
-      <div class="form-group">
-        <label for="author">Level Author</label>
-        <input type="text" id="author" name="author" required>
-      </div>
-      <div class="form-group">
-        <label for="id">Level ID</label>
-        <input type="number" id="id" name="id" required>
-      </div>
-      <div class="form-group checkbox-group">
-        <label for="noclip">Noclip Required?</label>
-        <input type="checkbox" id="noclip" name="noclip">
-      </div>
-      <div class="form-group">
-        <label for="notes">Additional Notes</label>
-        <input type="text" id="notes" name="notes">
-      </div>
-      <div class="form-group">
-        <label>Upload Macro</label>
-        <input type="file" id="macroFile" name="macroFile" required>
-        <div class="characterLimit" id="characterLimit"></div>
-        <div class="fileType" id="fileType"></div>
-      </div>
-      <div class="form-group">
-        <button type="submit" id="submitButton">Submit</button>
+
+      <div id="step2" style="display:none;">
+        <h1>Submit Macro</h1>
+        <div class="form-group">
+          <label for="noclip">Is Noclip Required?</label>
+          <div class="noclip-toggle-group">
+            <input type="hidden" id="noclip" name="noclip" value="false">
+
+            <button type="button" class="noclip-button selected" data-value="false">❌ No</button>
+            <button type="button" class="noclip-button" data-value="true">✅ Yes</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="notes">Any Additional Notes?</label>
+          <input type="text" id="notes" name="notes">
+        </div>
+        <div class="form-group">
+          <label>Upload Macro</label>
+          <input type="file" id="macroFile" name="macroFile" accept=".gdr,.gdr.json,.xd,.re,.re2,.mhr" required style="display: none;">
+          <button type="button" id="uploadButton" class="custom-file-button">No file chosen</button>
+          <div class="fileType" id="fileType"></div>
+        </div>
+        <div class="form-group">
+          <button type="submit" id="submitButton" disabled>Submit</button>
+        </div>
       </div>
     </form>
   </div>
+
   <script src="/js/submit-macro.js"></script>
 </body>
 

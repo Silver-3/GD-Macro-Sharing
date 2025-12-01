@@ -1,6 +1,7 @@
 window.onload = () => {
     const fragment = new URLSearchParams(window.location.hash.slice(1));
     const [accessToken, tokenType] = [fragment.get('access_token'), fragment.get('token_type')];
+    const returnUrl = fragment.get('state') || '/';
 
     if (!accessToken) return document.getElementById('login').style.display = 'block';
 
@@ -13,7 +14,7 @@ window.onload = () => {
             date.setFullYear(date.getFullYear() + 10);
 
             document.cookie = `userId=${id}; expires=${date.toUTCString()}; path=/`;
-            window.location.href = '/submit-macro';
+            window.location.href = decodeURIComponent(returnUrl);
         })
         .catch(console.error)
 }

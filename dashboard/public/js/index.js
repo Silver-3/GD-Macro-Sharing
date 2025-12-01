@@ -11,12 +11,21 @@ window.onload = () => {
         return "";
     }
 
-    const login = document.getElementById("login");
-
-    login.addEventListener("click", () => {
-        window.location.href = "https://discord.com/oauth2/authorize?client_id=1383593364582174790&response_type=token&redirect_uri=http%3A%2F%2F45.61.162.33%3A8470%2Fauth&scope=identify";
-    });
-
+    const signInText = document.getElementById("sign-in");
     const userId = getCookie("userId");
-    if (userId) window.location.href = '/submit-macro';
+
+    if (userId) {
+        signInText.style.display = "none";
+
+        fetch(`/api/user/${userId}`)
+        .then(res => res.json())
+        .then(data => {
+            const user = data.user;
+
+            document.getElementById("username").innerText = '@' + (user?.globalName ? user.globalName : user.username);
+            document.getElementById("username").style.display = "block";
+            document.getElementById("avatar").src = user.displayAvatarURL;
+        })
+        .catch(console.error)
+    }
 }

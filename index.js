@@ -1,5 +1,6 @@
 const Discord = require('discord.js');
 const dashboard = require('./dashboard/server.js');
+const db = require('./managers/database.js');
 
 const botConfig = require('./config/bot.js');
 const idConfig = require('./config/ids.js');
@@ -12,7 +13,6 @@ const client = new Discord.Client({
 client.commands = new Discord.Collection();
 client.config = { ...botConfig, ...idConfig, ...linkConfig };
 client.preLoginLogQueue = [];
-client.fakeWebhook = require('./managers/fakeWebhook.js');
 
 if (botConfig.sendLogs == true) {
     const originalConsoleLog = console.log;
@@ -28,6 +28,7 @@ if (botConfig.sendLogs == true) {
 });
 
 dashboard(client);
+db.connect();
 client.login(botConfig.token);
 
 process.on("uncaughtException", (err) => {

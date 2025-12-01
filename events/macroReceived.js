@@ -1,10 +1,7 @@
 const Discord = require('discord.js');
-const path = require('path');
 const fs = require('fs');
-
-const macroFilePath = path.join(__dirname, '../macros.json');
-const loadMacros = () => JSON.parse(fs.readFileSync(macroFilePath, 'utf8'));
-const server = require('../dashboard/server.js');
+const path = require('path');
+const db = require('../managers/database.js');
 
 module.exports = {
     name: 'macroReceived',
@@ -15,7 +12,6 @@ module.exports = {
      */
     run: async (macro, client) => {
         const guild = client.guilds.cache.get(client.config.server);
-        const macros = loadMacros();
 
         let channel;
         const channelId = {
@@ -55,7 +51,17 @@ module.exports = {
         });
 
         if (macro.size > 10) {
-            const downloadedMacro = `${client.config.url}download/${user.id}/${macro.name}`
+            const folder = path.join(__dirname, "../macros", thread.id);
+
+            if (!fs.existsSync(folder)) {
+                fs.mkdirSync(folder, { recursive: true});
+            }
+
+            const filePath = path.join(folder, macro.originalFileName);
+
+            fs.renameSync(macro.filePath, filePath);
+
+            const downloadedMacro = `${client.config.url}download/${thread.id}/download`;
 
             const Button = new Discord.ButtonBuilder()
                 .setLabel('Download Macro (above 10mb)')
@@ -70,61 +76,31 @@ module.exports = {
                 components: [ActionRow]
             });
             
-            const macroKey = `${user.id}-${macro.name}`;
-            
-            macros.downloads[macroKey] = {
-                userID: user.id,
-    			id: macro.id,
-    			name: macro.name,
-    			author: macro.author,
-    			originalFileName: macro.originalFileName,
-    			filePath: macro.filePath,
-    			size: macro.size,
-    			type: macro.type,
-    			noclip: macro.noclip,
-    			notes: macro.notes,
-    			link: `${client.config.url}download/${user.id}/${macro.name}`
-            }
-
-   			macros.uploads = {};
-            fs.writeFileSync(macroFilePath, JSON.stringify(macros, null, 2));
+            db.push({
+                name: macro.name,
+                author: macro.author,
+                levelId: macro.id,
+                noclip: macro.noclip,
+                notes: macro.notes,
+                type: macro.type.slice(1),
+                channelId: thread.id,
+                userId: user.id
+            });
         } else {
             await thread.send({ content: `<@${user.id}>`, files: [macro.filePath] });
 
-            if (!macro.filePath.startsWith('https')) {
-                macros.uploads = {};
-                fs.writeFileSync(macroFilePath, JSON.stringify(macros, null, 2));
-                fs.unlinkSync(macro.filePath);
-            } else {
-                const messages = await macro.clone.messages.fetch();
-                const messageArray = Array.from(messages.values()).reverse();
-                
-                const deleteButton = new Discord.ButtonBuilder()
-                	.setCustomId('delete_channel')
-                	.setLabel('Delete channel')
-                	.setStyle(Discord.ButtonStyle.Danger)
-                
-                const deleteActionRow = new Discord.ActionRowBuilder()
-                	.addComponents(deleteButton)
-           
-                macro.clone.send({ content: `Thread cloned to <#${thread.id}>`, components: [deleteActionRow]});
-                client.fakeWebhook(messageArray, channel, client, thread.id);
-            }
+            db.push({
+                name: macro.name,
+                author: macro.author,
+                levelId: macro.id,
+                noclip: macro.noclip,
+                notes: macro.notes,
+                type: macro.type.slice(1),
+                channelId: thread.id,
+                userId: user.id
+            });
+
+            fs.unlinkSync(macro.filePath);
         }
-
-        let macroType = macro.type.replace('.', '');
-        if (macroType == 'json') macroType = 'gdr';
-        if (macroType == 're2') macroType = 're';
-
-        const macroObject = {
-            name: macro.name,
-            channelId: thread.id,
-            userID: user.id
-        }
-
-        if (!macros.stored[macroType]) macros.stored[macroType] = [];
-
-        macros.stored[macroType].push(macroObject);
-        server.updateMacros(macros);
     }
 }
