@@ -1,7 +1,3 @@
-function disableButton(this) {
-  this.disabled = true;
-}
-
 window.onload = () => {
   const levelIdInput = document.getElementById("id");
   const nameInput = document.getElementById("name");
@@ -139,5 +135,11 @@ window.onload = () => {
       const selectedValue = this.getAttribute('data-value');
       hiddenNoclipInput.value = selectedValue;
     });
+  });
+
+  const macroForm = document.getElementById("macroForm");
+
+  macroForm.addEventListener("sumbit", () => {
+    submitButton.disabled = true;
   });
 }
