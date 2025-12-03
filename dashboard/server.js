@@ -207,10 +207,10 @@ module.exports = (client) => {
     }
 
     if (response.status == 200 && response.data && response.data.sucess !== false) {
-      const data = response.data;
+      const data = response.data.records.at(-1);
       return res.json({
-        name: data.cache_level_name,
-        author: data.cache_username
+        name: data.level_name,
+        author: data.username
       });
     }
 

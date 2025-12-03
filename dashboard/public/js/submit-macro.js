@@ -1,3 +1,7 @@
+function disableButton(this) {
+  this.disabled = true;
+}
+
 window.onload = () => {
   const levelIdInput = document.getElementById("id");
   const nameInput = document.getElementById("name");
