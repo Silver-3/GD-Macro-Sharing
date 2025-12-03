@@ -13,6 +13,9 @@ async function download(button) {
 }
 
 window.onload = () => {
+    let allMacros = [];
+    let renderLoopId = 0;
+
     function getCookie(name) {
         let decodedCookie = decodeURIComponent(document.cookie);
         let cookies = decodedCookie.split(';');
@@ -30,12 +33,10 @@ window.onload = () => {
 
     if (userId) {
         signInText.style.display = "none";
-
         fetch(`/api/user/${userId}`)
             .then(res => res.json())
             .then(data => {
                 const user = data.user;
-
                 document.getElementById("username").innerText = '@' + (user?.globalName ? user.globalName : user.username);
                 document.getElementById("username").style.display = "block";
                 document.getElementById("avatar").src = user.displayAvatarURL;
@@ -47,9 +48,9 @@ window.onload = () => {
         try {
             const res = await fetch('/api/macros');
             const data = await res.json();
-            const macros = data.macros;
-
-            renderMacros(macros);
+            
+            allMacros = data.macros;
+            filterAndRender();
         } catch (err) {
             console.error("Failed to load macros:", err);
         }
@@ -58,14 +59,22 @@ window.onload = () => {
     function renderMacros(list) {
         const grid = document.getElementById("macro-grid");
         grid.innerHTML = "";
+
+        renderLoopId++; 
+        const currentId = renderLoopId;
+
         let currentIndex = 0;
+        const chunkSize = 30;
 
         function renderChunk() {
-            const endIndex = Math.min(currentIndex + 20, list.length);
+            if (currentId !== renderLoopId) return;
+
+            const endIndex = Math.min(currentIndex + chunkSize, list.length);
             let htmlChunk = "";
-            
+
             for (let i = currentIndex; i < endIndex; i++) {
                 const macro = list[i];
+
                 htmlChunk += `
                 <div class="macro-card" data-type="${macro.type}" data-noclip="${macro.noclip}">
                     <div class="macro-header">
@@ -88,71 +97,46 @@ window.onload = () => {
                 `;
             }
 
-            grid.innerHTML += htmlChunk;
+            grid.insertAdjacentHTML('beforeend', htmlChunk);
+
             currentIndex = endIndex;
+
             if (currentIndex < list.length) {
-                setTimeout(renderChunk, 0); 
+                requestAnimationFrame(renderChunk);
             }
         }
 
         renderChunk();
     }
 
-    loadMacros();
-
     const searchInput = document.getElementById("searchInput");
-
-    function search() {
-        const searchValue = searchInput.value.toLowerCase();
-        const cards = document.querySelectorAll(".macro-card");
-
-        cards.forEach(card => {
-            const name = card.querySelector("h2").textContent.toLowerCase();
-            const author = card.querySelector(".author").textContent.toLowerCase();
-
-            if (name.includes(searchValue) || author.includes(searchValue)) {
-                card.style.display = "flex";
-            } else {
-                card.style.display = "none";
-            }
-        });
-    };
-
     const fileTypeFilter = document.getElementById("fileTypeFilter");
     const noclipFilter = document.getElementById("noclipFilter");
 
-
-    function filters() {
+    function filterAndRender() {
         const searchValue = searchInput.value.toLowerCase();
         const typeValue = fileTypeFilter.value;
         const noclipValue = noclipFilter.value;
 
-        const cards = document.querySelectorAll(".macro-card");
+        const filteredList = allMacros.filter(macro => {
+            const name = macro.name.toLowerCase();
+            const author = macro.author.toLowerCase();
+            const type = macro.type;
+            const noclip = macro.noclip;
 
-        cards.forEach(card => {
-            const name = card.querySelector("h2").textContent.toLowerCase();
-            const author = card.querySelector(".author").textContent.toLowerCase();
-            const type = card.getAttribute("data-type");
-            const noclip = card.getAttribute("data-noclip");
+            const matchesSearch = name.includes(searchValue) || author.includes(searchValue);
+            const matchesType = typeValue === "" || type === typeValue;
+            const matchesNoclip = noclipValue === "" || (noclipValue === "yes" && noclip === "yes") || (noclipValue === "no" && noclip === "no");
 
-            const matchesSearch =
-                name.includes(searchValue) ||
-                author.includes(searchValue);
-
-            const matchesType = typeValue == "" || type == typeValue;
-            const matchesNoclip = noclipValue == "" || (noclipValue == "yes" && noclip == "yes") || (noclipValue == "no" && noclip == "no");
-
-            if (matchesSearch && matchesType && matchesNoclip) {
-                card.style.display = "flex";
-            } else {
-                card.style.display = "none";
-            }
+            return matchesSearch && matchesType && matchesNoclip;
         });
+
+        renderMacros(filteredList);
     }
 
-    searchInput.addEventListener("input", search);
-    searchInput.addEventListener("input", filters);
+    searchInput.addEventListener("input", filterAndRender);
+    fileTypeFilter.addEventListener("change", filterAndRender);
+    noclipFilter.addEventListener("change", filterAndRender);
 
-    fileTypeFilter.addEventListener("change", filters);
-    noclipFilter.addEventListener("change", filters);
+    loadMacros();
 }
