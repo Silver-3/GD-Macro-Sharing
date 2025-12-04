@@ -136,9 +136,7 @@ module.exports = (client) => {
 
       const filePath = path.join(macroFolder, files[0]);
 
-      return res.download(filePath, err => {
-        if (err) console.error("Download error:", err);
-      });
+      return res.download(filePath, () => {});
     }
 
     if (option === "link") {

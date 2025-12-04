@@ -31,10 +31,11 @@ dashboard(client);
 db.connect();
 client.login(botConfig.token);
 
-process.on("uncaughtException", (err) => {
-    console.log("[ERROR] Caugh Uncaught Exception: ", err);
+process.on("uncaughtException", (error) => {
+    console.error(error.stack); 
 });
 
-process.on("unhandledRejection", (reason, promise) => {
-    console.log("[ERROR] Caught Unhandled Rejection: ", reason);
+process.on("unhandledRejection", (error) => {
+    if (error.stack) console.log(error.stack);
+    else console.log(error);
 });
