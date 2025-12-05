@@ -121,10 +121,11 @@ window.onload = () => {
         const filteredList = allMacros.filter(macro => {
             const name = macro.name.toLowerCase();
             const author = macro.author.toLowerCase();
+            const levelId = (macro.levelId || "").toString().toLowerCase();
             const type = macro.type;
             const noclip = macro.noclip;
 
-            const matchesSearch = name.includes(searchValue) || author.includes(searchValue);
+            const matchesSearch = name.includes(searchValue) || author.includes(searchValue) || levelId.includes(searchValue);
             const matchesType = typeValue === "" || type === typeValue;
             const matchesNoclip = noclipValue === "" || (noclipValue === "yes" && noclip === "yes") || (noclipValue === "no" && noclip === "no");
 
