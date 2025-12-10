@@ -2,6 +2,7 @@ node_modules/
 logs/
 macros/
 config/
+config2/
 backup/
 package-lock.json
 *.sqlite
