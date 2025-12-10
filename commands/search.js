@@ -12,9 +12,7 @@ module.exports.run = async (interaction, client) => {
     const type = interaction.options.getString('type');
     const noclip = interaction.options.getString('noclip');
 
-    await interaction.deferReply({
-        flags: Discord.MessageFlags.Ephemeral
-    });
+    await interaction.deferReply();
 
     try {
         const macros = await db.all();
@@ -58,8 +56,7 @@ module.exports.run = async (interaction, client) => {
         embed.addFields(fields);
 
         interaction.editReply({
-            embeds: [embed],
-            flags: []
+            embeds: [embed]
         });
     } catch (error) {
         console.error("Error in search command:", error);
