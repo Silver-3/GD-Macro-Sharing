@@ -47,7 +47,7 @@ module.exports.run = async (interaction, client) => {
 
             return {
                 name: channel.name,
-                value: `<#${channel.id}>`,
+                value: `<#${channel.id}> (${macro.type})`,
                 inline: false
             };
         });
