@@ -20,8 +20,8 @@ module.exports = {
 
                 try {
                 	await member.timeout(10 * 60 * 1000, "Possible scam");
-                } catch (err) {
-                    console.log(`[ERROR] Failed to time out member`);
+                } catch (error) {
+                    console.log(`[ERROR] Failed to time out member: ${error}`);
                 }
 
                 const channel = await message.guild.channels.fetch(client.config.automodChannel);
@@ -35,8 +35,7 @@ module.exports = {
                     embeds: [automodEmbed]
                 });
             } catch (error) {
-                const fileName = path.basename(__filename);
-                console.log(`${error.name}\noccurred: ${fileName} in function scam automod\n${error.stack}`);
+                console.log(`[ERROR] Error in scam automod\n${error}`);
             }
         }
         

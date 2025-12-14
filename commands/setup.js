@@ -126,9 +126,6 @@ module.exports.data = new SlashCommand()
         .setName('macros')
         .setDescription('Setup macro submittion'))
     .addSubcommand(subcommand => subcommand
-        .setName('searchmacros')
-        .setDescription('Setup search macros'))
-    .addSubcommand(subcommand => subcommand
         .setName('rules')
         .setDescription('Setup rules'))
     .addSubcommand(subcommand => subcommand

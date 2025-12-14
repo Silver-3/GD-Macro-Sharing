@@ -1,5 +1,4 @@
-const { REST } = require('@discordjs/rest');
-const { Routes } = require('discord-api-types/v9');
+const Discord = require('discord.js');
 const fs = require('fs');
 
 const commands = [];
@@ -9,6 +8,7 @@ module.exports = async (client) => {
 
     for (const file of commandFiles) {
         const command = require(`../commands/${file}`);
+
         client.commands.set(command.data.name, command);
         commands.push(command.data.toJSON());
         console.log(`[COMMAND] ${command.data.name} has loaded`);
@@ -20,13 +20,13 @@ module.exports = async (client) => {
 module.exports.load = async (client, guildId) => {
     const clientId = client.user?.id;
   
-    const rest = new REST({
+    const rest = new Discord.REST({
       version: '9'
     }).setToken(client.config.token);
   
     try {
       await rest.put(
-        Routes.applicationGuildCommands(clientId, guildId), {
+        Discord.Routes.applicationGuildCommands(clientId, guildId), {
           body: commands
         },
       ); 

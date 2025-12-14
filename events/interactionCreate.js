@@ -31,8 +31,7 @@ module.exports = {
         try {
             command.run(interaction, client);
         } catch (error) {
-            const fileName = path.basename(__filename);
-            console.log(`${error.name}\noccurred: ${fileName} in function command.run\n${error.stack}`);
+            console.error(error);
         }
     }
 }

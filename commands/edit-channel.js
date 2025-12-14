@@ -35,21 +35,15 @@ module.exports.run = async (interaction, client) => {
         const newChannelName = interaction.channel.name.replace(name, newName).replace(`made by ${author}`, `made by ${newAuthor}`).replace(`ID: ${id}`, `ID: ${levelId}`);
         let currentMessage = '';
 
-        // update channel name
-
         try {
-            currentMessage = currentMessage + '✅ Channel name updated';
             await interaction.channel.setName(newChannelName);
+            currentMessage = currentMessage + '✅ Channel name updated';
         } catch (error) {
-            currentMessage = currentMessage + '❌ Failed to change channel name';
             console.log(`[ERROR] Failed to update channel name: ${error}`);
+            currentMessage = currentMessage + '❌ Failed to change channel name';
         }
 
-        // update embed
-
         try {
-            currentMessage = currentMessage + '\n✅ Embed updated';
-
             const message = await interaction.channel.fetchStarterMessage();
             const embed = message.embeds[0];
 
@@ -59,21 +53,21 @@ module.exports.run = async (interaction, client) => {
             await message.edit({
                 embeds: [newEmbed]
             });
+
+            currentMessage = currentMessage + '\n✅ Embed updated';
         } catch (error) {
-            currentMessage = currentMessage + '\n❌ Failed to update embed'
             console.log(`[ERROR] Failed to update embed: ${error}`);
+            currentMessage = currentMessage + '\n❌ Failed to update embed'
         }
 
-        // update db
-
         try {
-            currentMessage = currentMessage + '\n✅ DB updated';
             db.change(interaction.channel.id, 'name', newName);
             db.change(interaction.channel.id, 'author', newAuthor);
             db.change(interaction.channel.id, 'levelId', levelId);
+            currentMessage = currentMessage + '\n✅ DB updated';
         } catch (error) {
-            currentMessage = currentMessage + '\n❌ Failed to update db'
             console.log(`[ERROR] Failed to update db: ${error}`);
+            currentMessage = currentMessage + '\n❌ Failed to update db'
         }
 
         await interaction.editReply({
@@ -85,7 +79,6 @@ module.exports.run = async (interaction, client) => {
             content: '❌ Failed to find matches in the channel name'
         });
     }
-
 }
 
 module.exports.data = new SlashCommand()

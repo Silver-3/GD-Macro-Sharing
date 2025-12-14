@@ -15,10 +15,14 @@ module.exports = {
             .setDescription(`Everyone welcome our new member, <@${member.id}> to ${member.guild.name}`)
             .setColor('Green')
 
-        welcomeChannel.send({
-            embeds: [embed]
-        });
+        try {
+            welcomeChannel.send({
+                embeds: [embed]
+            });
 
-        member.roles.add(client.config.memberRole);
+            member.roles.add(client.config.memberRole);
+        } catch (error) {
+            console.log('Failed to send join message/add role: ' + error)
+        }
     }
 }

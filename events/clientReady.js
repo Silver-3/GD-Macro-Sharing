@@ -10,11 +10,9 @@ module.exports = {
      */
     run: async (client) => {
         let logMsg;
-
+        
         const logsDir = path.join(__dirname, '..', 'logs');
-        if (!fs.existsSync(logsDir)) {
-            fs.mkdirSync(logsDir);
-        }
+        if (!fs.existsSync(logsDir)) fs.mkdirSync(logsDir);
 
         const logFileName = `log-${new Date().toISOString().slice(0, 10)}.txt`;
         const logFilePath = path.join(logsDir, logFileName);

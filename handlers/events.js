@@ -5,11 +5,10 @@ module.exports = (client) => {
     const eventsFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
 
     for (const file of eventsFiles) {
-        const filePath = path.join('../events', file);
-        const event = require(filePath);
+        const event = require(path.join('../events', file));
         const eventName = file.replace('.js', '');
 
-        console.log(`[Event] ${eventName} has loaded.`);
+        console.log(`[EVENT] ${eventName} has loaded.`);
 
         if (event.once) {
             client.once(event.name, (...args) => event.run(...args, client, client.db));

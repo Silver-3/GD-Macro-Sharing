@@ -69,9 +69,7 @@ module.exports.run = async (interaction, client) => {
             await db.delete(channel.id);
 
             const folderPath = path.join(__dirname, "..", "macros", channel.id);
-            if (fs.existsSync(folderPath)) {
-                fs.rmSync(folderPath, { recursive: true, force: true });
-            }
+            if (fs.existsSync(folderPath)) fs.rmSync(folderPath, { recursive: true, force: true });
 
             channel.delete().catch(() => {});
 
@@ -98,7 +96,7 @@ module.exports.run = async (interaction, client) => {
             });
         }
     });
-};
+}
 
 module.exports.data = new SlashCommand()
     .setName('delete-macro')

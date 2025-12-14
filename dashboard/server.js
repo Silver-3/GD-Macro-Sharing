@@ -93,6 +93,7 @@ module.exports.run = (client) => {
   app.use(bodyParser.urlencoded({
     extended: true
   }));
+
   app.use(bodyParser.json());
   app.use(express.static(path.join(__dirname, "public")));
 
@@ -139,6 +140,7 @@ module.exports.run = (client) => {
       if (data && data.found && data.name && data.author) {
         name = data.name;
         author = data.author;
+
         console.log(`Successfully fetched level: ${name} by ${author}`);
       } else {
         console.log(`Error: Level data not found or invalid from API.`);
@@ -204,7 +206,7 @@ module.exports.run = (client) => {
       return res.send(attachment.url);
     }
 
-    return res.status(404).send("Invalid option");
+    return res.status(404).send("Invalid option, if this came from a 10mb macro button, run /updated-button");
   });
 
 

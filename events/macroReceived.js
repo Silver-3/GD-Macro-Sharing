@@ -113,7 +113,7 @@ module.exports = {
                 }
             }
         } catch (error) {
-            console.error("Error in macroReceived:", error);
+            console.error(error);
         } finally {
             setTimeout(() => {
                 macros.delete(key);

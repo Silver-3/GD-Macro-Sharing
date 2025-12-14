@@ -8,19 +8,23 @@ const Discord = require('discord.js');
 module.exports.run = async (interaction, client) => {
     await interaction.deferReply();
 
-    try {
-        const row = new Discord.ActionRowBuilder().addComponents(
-        new Discord.ButtonBuilder()
+    const messages = await interaction.channel.messages.fetch({ limit: 2, after: interaction.channel.id });
+    const message = messages.at(-1);
+
+    if (interaction.channel.isThread() && message.components[0]) {
+        const button = new Discord.ButtonBuilder()
             .setLabel("Download Macro (above 10mb)")
             .setStyle(Discord.ButtonStyle.Link)
             .setURL(`${client.config.url}download/${interaction.channel.id}/download`)
-        );
+
+        const row = new Discord.ActionRowBuilder()
+            .addComponents(button)
 
         interaction.editReply({ 
             content: "Here is the updated button", 
             components: [row] 
         });
-    } catch (error) {
+    } else {
         interaction.editReply("Button was not found, please use this in a channel with a 'Download Macro' button")
     }
 }

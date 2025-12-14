@@ -1,9 +1,6 @@
 const Discord = require('discord.js');
 const util = require('util');
-const path = require('path');
 const fs = require('fs');
-
-const macrosFilePath = path.resolve(__dirname, '../macros.json');
 
 /**
  * @param {Discord.Interaction} interaction
