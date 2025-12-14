@@ -24,7 +24,7 @@ class Database {
             );
         `);
 
-        console.log("[Database] Connected to SQLite");
+        console.log("[DATABASE] Connected to SQLite");
         return this;
     }
 
