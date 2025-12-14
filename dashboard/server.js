@@ -57,7 +57,39 @@ function getCookie(req, name) {
   return "";
 }
 
-module.exports = (client) => {
+async function fetchLevel(levelId) {
+  try {
+    const response = await axios.get(`https://history.geometrydash.eu/api/v1/level/${encodeURIComponent(levelId)}/`, {
+      timeout: 8000
+    });
+
+    if (response.status === 200 && response.data && response.data.sucess !== false) {
+      const {
+        records,
+        cache_level_name,
+        cache_username
+      } = response.data;
+      const data = records.at(-1);
+
+      return {
+        found: true,
+        name: data.level_name || cache_level_name,
+        author: data.username || cache_username
+      };
+    }
+  } catch (error) {
+    console.error(`Error fetching level ${levelId}:`, error.message);
+    return { 
+      found: false
+    };
+  }
+
+  return {
+    found: false
+  };
+}
+
+module.exports.run = (client) => {
   app.use(bodyParser.urlencoded({
     extended: true
   }));
@@ -84,10 +116,10 @@ module.exports = (client) => {
     res.sendFile(path.join(__dirname, "views", "submit-macro.html"));
   });
 
-  app.post("/submit-macro", upload.single("macroFile"), (req, res) => {
+  app.post("/submit-macro", upload.single("macroFile"), async (req, res) => {
     const userID = getCookie(req, "userId");
 
-    const {
+    let {
       name,
       author,
       id,
@@ -98,6 +130,19 @@ module.exports = (client) => {
 
     if (!file) {
       return res.status(400).send("Missing upload file");
+    }
+
+    if (name == 'Not Found' && author == 'Unknown') {
+      console.log(`Macro name and author is unknown, fetching level data...`);
+      const data = await fetchLevel(id);
+
+      if (data && data.found && data.name && data.author) {
+        name = data.name;
+        author = data.author;
+        console.log(`Successfully fetched level: ${name} by ${author}`);
+      } else {
+        console.log(`Error: Level data not found or invalid from API.`);
+      }
     }
 
     let fileType = path.extname(file.originalname).toLowerCase();
@@ -145,7 +190,9 @@ module.exports = (client) => {
       const channel = await client.channels.fetch(channelId).catch(() => null);
       if (!channel) return res.status(404).send(`Macro thread not found: [${channelId}]`);
 
-      const messages = await channel.messages.fetch({ limit: 2 });
+      const messages = await channel.messages.fetch({
+        limit: 2
+      });
       const sorted = messages.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
       const message = Array.from(sorted.values())[1];
 
@@ -191,32 +238,18 @@ module.exports = (client) => {
 
   app.get('/api/level/:levelID', async (req, res) => {
     const levelId = req.params.levelID;
+    const data = await fetchLevel(levelId);
 
-    let response;
-
-    try {
-      response = await axios.get(`https://history.geometrydash.eu/api/v1/level/${encodeURIComponent(levelId)}/`, {
-        timeout: 8000
+    if (data.found) {
+      res.json({
+        name: data.name,
+        author: data.author
       });
-    } catch (error) {
-      return res.json({
+    } else {
+      res.json({
         error: "Level not found"
       });
     }
-
-    if (response.status == 200 && response.data && response.data.sucess !== false) {
-        const { records, cache_level_name, cache_username } = response.data;
-	    const data = records.at(-1);
-
-		return res.json({
-  			name: data.level_name || cache_level_name,
-  			author: data.username || cache_username
-		});
-    }
-
-    return res.json({
-      error: "Level not found"
-    });
   });
 
   app.get('/api/oauth2', async (req, res) => {
@@ -229,3 +262,5 @@ module.exports = (client) => {
     console.log(`[INFO] Server is running at ${config.url}`);
   });
 }
+
+module.exports.fetchLevel = fetchLevel;

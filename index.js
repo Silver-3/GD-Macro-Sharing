@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const dashboard = require('./dashboard/server.js');
+const server = require('./dashboard/server.js');
 const db = require('./managers/database.js');
 
 const botConfig = require('./config/bot.js');
@@ -27,7 +27,7 @@ if (botConfig.sendLogs == true) {
     require(`./handlers/${handler}`)(client);
 });
 
-dashboard(client);
+server.run(client);
 db.connect();
 client.login(botConfig.token);
 

@@ -74,6 +74,18 @@ class Database {
         const stmt = this.db.prepare(`SELECT * FROM macros WHERE channelId = ?`);
         return stmt.get(channelId);
     }
+
+    change(channelId, column, newValue) {
+        if (!this.db) throw new Error("Database not connected!");
+
+        const allowedColumns = ['name', 'author', 'levelId', 'noclip', 'notes', 'type', 'userId'];
+        if (!allowedColumns.includes(column)) throw new Error(`Invalid column: '${column}'. Allowed updates: ${allowedColumns.join(', ')}`);
+
+        const stmt = this.db.prepare(`UPDATE macros SET "${column}" = ? WHERE channelId = ?`);
+        const info = stmt.run(newValue, channelId);
+
+        return info.changes > 0;
+    }
 }
 
 module.exports = new Database();
