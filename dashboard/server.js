@@ -78,7 +78,6 @@ async function fetchLevel(levelId) {
       };
     }
   } catch (error) {
-    console.error(`Error fetching level ${levelId}:`, error.message);
     return { 
       found: false
     };
