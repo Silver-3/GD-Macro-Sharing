@@ -6,8 +6,6 @@ const Discord = require('discord.js');
  * @param {Discord.CommandInteraction} interaction 
  */
 module.exports.run = async (interaction, client) => {
-    await interaction.deferReply();
-
     const messages = await interaction.channel.messages.fetch({ limit: 2, after: interaction.channel.id });
     const message = messages.at(-1);
 
@@ -20,12 +18,15 @@ module.exports.run = async (interaction, client) => {
         const row = new Discord.ActionRowBuilder()
             .addComponents(button)
 
-        interaction.editReply({ 
+        interaction.reply({ 
             content: "Here is the updated button", 
             components: [row] 
         });
     } else {
-        interaction.editReply("Button was not found, please use this in a channel with a 'Download Macro' button")
+        interaction.reply({
+            content: "Button was not found, please use this in a channel with a 'Download Macro' button",
+            flags: Discord.MessageFlags.Ephemeral
+        });
     }
 }
 

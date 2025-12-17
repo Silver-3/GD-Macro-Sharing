@@ -12,6 +12,11 @@ module.exports.run = async (interaction, client) => {
     const type = interaction.options.getString('type');
     const noclip = interaction.options.getString('noclip');
 
+    if (interaction.channel.id !== client.config.commandsChannel) return interaction.reply({
+        content: `You can only use this command in <#${client.config.commandsChannel}>`,
+        flags: Discord.MessageFlags.Ephemeral
+    });
+
     await interaction.deferReply();
 
     try {
@@ -20,7 +25,8 @@ module.exports.run = async (interaction, client) => {
             if (type && macro.type !== type) return false;
             if (noclip !== null && (macro.noclip.toLowerCase() !== noclip)) return false;
 
-            if (by == 'name') return macro.name.toLowerCase().includes(search);
+            if (by == 'any') return (macro.name.toLowerCase().includes(search) || macro.author.toLowerCase().includes(search) || String(macro.levelId) == search || String(macro.id) == search);
+            else if (by == 'name') return macro.name.toLowerCase().includes(search);
             else if (by == 'author') return macro.author.toLowerCase().includes(search);
             else if (by == 'id') return String(macro.levelId) == search || String(macro.id) == search;
 
@@ -46,10 +52,9 @@ module.exports.run = async (interaction, client) => {
             const channel = await interaction.guild.channels.fetch(macro.channelId);
 
             return {
-                name: channel.name,
-                value: `<#${channel.id}> (${macro.type})`,
-                inline: false
-            };
+                name: channel ? channel.name : 'Unknown Channel',
+                value: `<#${channel.id}> (${macro.type})`
+            };  
         });
 
         const fields = await Promise.all(fieldPromises);
@@ -74,6 +79,9 @@ module.exports.data = new SlashCommand()
         .setDescription("What do you want to search for a level by")
         .setRequired(true)
         .addChoices({
+            name: 'Any',
+            value: 'any'
+        },{
             name: 'Name',
             value: 'name'
         }, {

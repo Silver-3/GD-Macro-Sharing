@@ -53,6 +53,11 @@ async function makeLeaderboard(counts, client, sender) {
  * @param {Discord.CommandInteraction} interaction 
  */
 module.exports.run = async (interaction, client) => {
+    if (interaction.channel.id !== client.config.commandsChannel) return interaction.reply({
+        content: `You can only use this command in <#${client.config.commandsChannel}>`,
+        flags: Discord.MessageFlags.Ephemeral
+    });
+
     await interaction.deferReply();
 
     try {
