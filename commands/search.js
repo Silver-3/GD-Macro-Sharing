@@ -12,7 +12,7 @@ module.exports.run = async (interaction, client) => {
     const type = interaction.options.getString('type');
     const noclip = interaction.options.getString('noclip');
 
-    if (interaction.channel.id !== client.config.commandsChannel) return interaction.reply({
+    if (interaction.channel.id !== client.config.commandsChannel && !interaction.channel.isThread()) return interaction.reply({
         content: `You can only use this command in <#${client.config.commandsChannel}>`,
         flags: Discord.MessageFlags.Ephemeral
     });
