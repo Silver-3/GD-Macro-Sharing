@@ -186,7 +186,7 @@ module.exports.run = (client) => {
 
       return res.send(attachment.url);
     } else {
-      if (!fs.existsSync(macroFolder)) return res.status(404).send("Macro folder not found.");
+      if (!fs.existsSync(macroFolder)) return res.status(404).send("Macro folder not found. Try run /updated-button in discord");
 
       const files = fs.readdirSync(macroFolder);
       if (files.length === 0) return res.status(404).send("No files found in macro folder.");
