@@ -31,7 +31,7 @@ module.exports = {
         try {
             command.run(interaction, client);
         } catch (error) {
-            console.error(error);
+            console.log(error);
         }
     }
 }

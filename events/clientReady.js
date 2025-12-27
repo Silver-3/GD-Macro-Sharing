@@ -91,7 +91,7 @@ module.exports = {
         }
 
         console.log(`[BOT] Bot is online.`);
-        client.user.setActivity(`Watching over ${client.guilds.cache.get(client.config.server).name}`, {
+        client.user.setActivity(`Watching over ${client.guilds.cache.get(client.config.serverId).name}`, {
             type: Discord.ActivityType.Watching
         });
 

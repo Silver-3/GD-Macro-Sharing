@@ -32,7 +32,7 @@ module.exports.run = async (interaction, client) => {
         const submitButton = new Discord.ButtonBuilder()
             .setLabel('Submit a macro')
             .setStyle(Discord.ButtonStyle.Link)
-            .setURL(client.config.url + 'submit-macro');
+            .setURL(client.config.urls.base + 'submit-macro');
 
         const submitActionRow = new Discord.ActionRowBuilder()
             .addComponents(submitButton)
@@ -45,7 +45,7 @@ module.exports.run = async (interaction, client) => {
         const searchButton = new Discord.ButtonBuilder()
             .setLabel('Browse Macros')
             .setStyle(Discord.ButtonStyle.Link)
-            .setURL(client.config.url + 'browse-macros');
+            .setURL(client.config.urls.base + 'browse-macros');
 
         const searchActionRow = new Discord.ActionRowBuilder()
             .addComponents(searchButton)
@@ -73,7 +73,7 @@ module.exports.run = async (interaction, client) => {
             embeds: [rulesEmbed]
         });
 
-        interaction.channel.send("__**Invite link for this server**__\n" + client.config.invite)
+        interaction.channel.send("__**Invite link for this server**__\n" + client.config.urls.invite)
     } else if (subcommand == 'self-roles') {
         const selfRolesEmbed = new Discord.EmbedBuilder()
             .setTitle('Self Roles')

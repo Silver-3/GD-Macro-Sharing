@@ -16,5 +16,5 @@ window.onload = () => {
             document.cookie = `userId=${id}; expires=${date.toUTCString()}; path=/`;
             window.location.href = decodeURIComponent(returnUrl);
         })
-        .catch(console.error)
+        .catch(error => console.log(error))
 }

@@ -13,7 +13,7 @@ module.exports.run = async (interaction, client) => {
         const button = new Discord.ButtonBuilder()
             .setLabel("Download Macro (above 10mb)")
             .setStyle(Discord.ButtonStyle.Link)
-            .setURL(`${client.config.url}download/${interaction.channel.id}/download`)
+            .setURL(`${client.config.urls.base}download/${interaction.channel.id}/download`)
 
         const row = new Discord.ActionRowBuilder()
             .addComponents(button)

@@ -4,19 +4,12 @@ const multer = require("multer");
 const axios = require('axios');
 const path = require("path");
 const fs = require("fs");
-const db = require('../managers/database.js');
 
-const botConfig = require('../config/bot.js');
-const idConfig = require('../config/ids.js');
-const linkConfig = require('../config/links.js');
-const config = {
-  ...botConfig,
-  ...idConfig,
-  ...linkConfig
-};
+const db = require('../managers/database.js');
+const config = require('../config.js');
 
 const app = express();
-const port = config.url.split(':').pop().replace('/', '');
+const port = config.urls.base.split(':').pop().replace('/', '');
 
 const macrosFolder = path.join(__dirname, "../macros");
 if (!fs.existsSync(macrosFolder)) {
@@ -174,19 +167,8 @@ module.exports.run = (client) => {
 
     const macroFolder = path.join(__dirname, "..", "macros", channelId);
 
-    if (option === "download") {
-      if (!fs.existsSync(macroFolder)) return res.status(404).send("Macro folder not found.");
-
-      const files = fs.readdirSync(macroFolder);
-      if (files.length === 0) return res.status(404).send("No files found in macro folder.");
-
-      const filePath = path.join(macroFolder, files[0]);
-
-      return res.download(filePath, () => {});
-    }
-
     if (option === "link") {
-      if (fs.existsSync(macroFolder)) return res.send(`${config.url}download/${channelId}/download`);
+      if (fs.existsSync(macroFolder)) return res.send(`${config.urls.base}download/${channelId}/download`);
 
       const channel = await client.channels.fetch(channelId).catch(() => null);
       if (!channel) return res.status(404).send(`Macro thread not found: [${channelId}]`);
@@ -203,12 +185,17 @@ module.exports.run = (client) => {
       if (!attachment) return res.status(404).send(`Macro attachment not found: [${channelId}]`);
 
       return res.send(attachment.url);
+    } else {
+      if (!fs.existsSync(macroFolder)) return res.status(404).send("Macro folder not found.");
+
+      const files = fs.readdirSync(macroFolder);
+      if (files.length === 0) return res.status(404).send("No files found in macro folder.");
+
+      const filePath = path.join(macroFolder, files[0]);
+
+      return res.download(filePath, () => {});
     }
-
-    return res.status(404).send("Invalid option, if this came from a 10mb macro button, run /updated-button");
   });
-
-
 
   app.get("/macro-submitted", (req, res) => {
     res.sendFile(path.join(__dirname, "views", "macro-submitted.html"));
@@ -255,12 +242,16 @@ module.exports.run = (client) => {
 
   app.get('/api/oauth2', async (req, res) => {
     res.json({
-      url: config.oauth2
+      url: config.urls.oauth2
     });
   });
 
+  app.get('/api/fileTypes', async (req, res) => {
+    res.json(config.fileTypes);
+  });
+
   app.listen(port, () => {
-    console.log(`[INFO] Server is running at ${config.url}`);
+    console.log(`[INFO] Server is running at ${config.urls.base}`);
   });
 }
 

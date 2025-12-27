@@ -24,7 +24,7 @@ module.exports = {
                     console.log(`[ERROR] Failed to time out member: ${error}`);
                 }
 
-                const channel = await message.guild.channels.fetch(client.config.automodChannel);
+                const channel = await message.guild.channels.fetch(client.config.channels.automod);
                 const automodEmbed = new Discord.EmbedBuilder()
                     .setAuthor({ name: member.user.username, iconURL: member.displayAvatarURL()})
                     .setDescription(message.content)

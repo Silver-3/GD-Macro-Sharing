@@ -16,6 +16,22 @@ window.onload = () => {
     let allMacros = [];
     let renderLoopId = 0;
 
+    fetch('/api/fileTypes')
+        .then(res => res.json())
+        .then(data => {
+            const fileTypeFilter = document.getElementById("fileTypeFilter");
+
+            Object.keys(data).forEach(type => {
+                const option = document.createElement("option");
+                option.value = type;
+                option.textContent = `.${type}`;
+                fileTypeFilter.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.log(error);
+        });
+
     function getCookie(name) {
         let decodedCookie = decodeURIComponent(document.cookie);
         let cookies = decodedCookie.split(';');
@@ -41,18 +57,18 @@ window.onload = () => {
                 document.getElementById("username").style.display = "block";
                 document.getElementById("avatar").src = user.displayAvatarURL;
             })
-            .catch(console.error)
+            .catch(error => console.log(error))
     }
 
     async function loadMacros() {
         try {
             const res = await fetch('/api/macros');
             const data = await res.json();
-            
+
             allMacros = data.macros;
             filterAndRender();
         } catch (err) {
-            console.error("Failed to load macros:", err);
+            console.log("Failed to load macros:", err);
         }
     }
 
@@ -60,7 +76,7 @@ window.onload = () => {
         const grid = document.getElementById("macro-grid");
         grid.innerHTML = "";
 
-        renderLoopId++; 
+        renderLoopId++;
         const currentId = renderLoopId;
 
         let currentIndex = 0;

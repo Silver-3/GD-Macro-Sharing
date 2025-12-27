@@ -1,6 +1,7 @@
 const SlashCommand = require('@discordjs/builders').SlashCommandBuilder;
 const Discord = require('discord.js');
 const db = require('../managers/database.js');
+const fileTypes = require('../config.js').fileTypes;
 
 /**
  * @param {Discord.Client} client 
@@ -12,8 +13,8 @@ module.exports.run = async (interaction, client) => {
     const type = interaction.options.getString('type');
     const noclip = interaction.options.getString('noclip');
 
-    if (interaction.channel.id !== client.config.commandsChannel && !interaction.channel.isThread()) return interaction.reply({
-        content: `You can only use this command in <#${client.config.commandsChannel}>`,
+    if (interaction.channel.id !== client.config.channels.commands && !interaction.channel.isThread()) return interaction.reply({
+        content: `You can only use this command in <#${client.config.channels.commands}>`,
         flags: Discord.MessageFlags.Ephemeral
     });
 
@@ -64,7 +65,7 @@ module.exports.run = async (interaction, client) => {
             embeds: [embed]
         });
     } catch (error) {
-        console.error("Error in search command:", error);
+        console.log("Error in search command:", error);
         interaction.editReply({
             content: 'Something went wrong with searching the database.'
         });
@@ -98,19 +99,10 @@ module.exports.data = new SlashCommand()
     .addStringOption(option => option
         .setName("type")
         .setDescription("Filter by type if you want")
-        .addChoices({
-            name: 'gdr',
-            value: 'gdr'
-        }, {
-            name: 'mhr',
-            value: 'mhr'
-        }, {
-            name: 're',
-            value: 're'
-        }, {
-            name: 'xd',
-            value: 'xd'
-        }))
+        .addChoices(...Object.keys(fileTypes).map(key => ({
+            name: key,
+            value: key
+        }))))
     .addStringOption(option => option
         .setName("noclip")
         .setDescription("Noclip on or off")

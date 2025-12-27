@@ -12,19 +12,34 @@ window.onload = () => {
   const submitButton = document.getElementById("submitButton");
   const uploadButton = document.getElementById("uploadButton");
 
+  let expectedFileTypes = [];
+
+  fetch('/api/fileTypes')
+    .then(res => res.json())
+    .then(data => {
+      expectedFileTypes = Object.values(data).flat();
+
+      if (fileInput) {
+        const acceptString = expectedFileTypes.map(type => '.' + type).join(', ');
+        fileInput.setAttribute('accept', acceptString);
+      }
+    })
+    .catch(error => {
+      console.log(error);
+    });
+
   function checkFile() {
     if (fileInput.files.length > 0) {
       const fileName = fileInput.files[0].name;
       let fileType = fileName.split('.').pop();
-      const expectedFiletypes = ["gdr", "gdr.json", "re", "re2", "mhr", "xd"];
-
+      
       uploadButton.textContent = fileName;
 
       if (fileName.endsWith('.gdr.json') || /\.gdr(\s*\(\d+\))?\.json$/.test(fileName)) {
         fileType = 'gdr.json';
       }
 
-      if (!expectedFiletypes.includes(fileType)) {
+      if (expectedFileTypes.length > 0 && !expectedFileTypes.includes(fileType)) {
         fileTypeText.textContent = `Invalid file type: .${fileType}`;
         fileTypeText.style.color = "red";
         submitButton.disabled = true;
@@ -34,7 +49,7 @@ window.onload = () => {
       }
 
     } else {
-      fileInfoText.textContent = "No file chosen";
+      if (typeof fileInfoText !== 'undefined') fileInfoText.textContent = "No file chosen";
       fileTypeText.textContent = "";
       submitButton.disabled = true;
     }
@@ -89,7 +104,7 @@ window.onload = () => {
         document.getElementById("username").innerText = '@' + (user?.globalName ? user.globalName : user.username);
         document.getElementById("avatar").src = user.displayAvatarURL;
       })
-      .catch(console.error)
+      .catch(error => console.log(error))
   }
 
   function searchLevel() {
@@ -109,9 +124,9 @@ window.onload = () => {
         }
       })
       .catch(error => {
-        console.error(error);
+        console.log(error);
         nextButton.disabled = true;
-      })
+      });
   }
 
   levelIdInput.addEventListener("input", searchLevel);

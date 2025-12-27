@@ -32,6 +32,6 @@ module.exports.load = async (client, guildId) => {
       ); 
       console.log(`[SLASH-COMMANDS] registered ${commands.length} commands in ${client.guilds.cache.get(guildId).name} (${guildId})`);
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
   };

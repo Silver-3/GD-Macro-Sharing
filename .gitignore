@@ -1,10 +1,10 @@
 node_modules/
 logs/
 macros/
-config/
-config2/
 backup/
+test/
 package-lock.json
+*.env
 *.sqlite
 *.bat
 *.txt

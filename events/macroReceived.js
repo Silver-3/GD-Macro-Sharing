@@ -19,20 +19,12 @@ module.exports = {
         macros.add(key);
 
         try {
-            const guild = client.guilds.cache.get(client.config.server);
-
+            const guild = client.guilds.cache.get(client.config.serverId);
             let channel;
-            const channelId = {
-                gdr: client.config.gdrChannel,
-                mhr: client.config.mhrChannel,
-                re: client.config.reChannel,
-                xd: client.config.xdChannel
-            }
 
-            if (macro.type == '.gdr' || macro.type == '.json') channel = guild.channels.cache.get(channelId.gdr);
-            else if (macro.type == '.mhr') channel = guild.channels.cache.get(channelId.mhr);
-            else if (macro.type == '.re' || macro.type == '.re2') channel = guild.channels.cache.get(channelId.re)
-            else if (macro.type == '.xd') channel = guild.channels.cache.get(channelId.xd);
+            for (const [type, extensions] of Object.entries(client.config.fileTypes)) {
+                if (extensions.includes(macro.type.slice(1))) channel = guild.channels.cache.get(client.config.channels[type]);
+            }
 
             const user = await client.users.fetch(macro.userID);
             const name = macro.name.replaceAll('_', ' ');
@@ -65,7 +57,7 @@ module.exports = {
                 const filePath = path.join(folder, macro.originalFileName);
                 if (fs.existsSync(macro.filePath)) fs.renameSync(macro.filePath, filePath);
 
-                const downloadedMacro = `${client.config.url}download/${thread.id}/download`;
+                const downloadedMacro = `${client.config.urls.base}download/${thread.id}/download`;
 
                 const Button = new Discord.ButtonBuilder()
                     .setLabel('Download Macro (above 10mb)')
@@ -108,12 +100,12 @@ module.exports = {
                     try {
                         fs.unlinkSync(macro.filePath);
                     } catch (err) {
-                        console.error("Error deleting file:", err);
+                        console.log("Error deleting file:", err);
                     }
                 }
             }
         } catch (error) {
-            console.error(error);
+            console.log(error);
         } finally {
             setTimeout(() => {
                 macros.delete(key);

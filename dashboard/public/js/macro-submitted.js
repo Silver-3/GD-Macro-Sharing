@@ -46,6 +46,6 @@ window.onload = () => {
         document.getElementById("username").innerText = '@' + (user?.globalName ? user.globalName : user.username);
         document.getElementById("avatar").src = user.displayAvatarURL;
       })
-      .catch(console.error)
+      .catch(error => console.log(error))
   };
 }

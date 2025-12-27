@@ -30,7 +30,7 @@ module.exports = async (interaction, client) => {
         }
     } else if (interaction.customId.startsWith('role')) {
         const roleInput = interaction.customId.replace('role_', '');
-        const role = interaction.guild.roles.cache.get(client.config[roleInput + 'Role']);
+        const role = interaction.guild.roles.cache.get(client.config.roles[roleInput]);
 
         if (interaction.member.roles.cache.has(role.id)) {
             interaction.member.roles.remove(role.id);
@@ -65,7 +65,7 @@ module.exports = async (interaction, client) => {
                     allow: ['ViewChannel']
                 },
                 {
-                    id: client.config.eventManagerRole,
+                    id: client.config.roles.eventManager,
                     allow: ['ViewChannel']
                 }
             ]
@@ -89,7 +89,7 @@ module.exports = async (interaction, client) => {
         });
 
         channel.send({
-            content: `<@&${client.config.eventManagerRole}> <@${interaction.user.id}>`,
+            content: `<@&${client.config.roles.eventManager}> <@${interaction.user.id}>`,
             embeds: [ticketEmbed],
             components: [actionRow]
         });

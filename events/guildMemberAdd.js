@@ -8,7 +8,7 @@ module.exports = {
      * @param {Discord.GuildMember} member
      */
     run: async (member, client) => {        
-        const welcomeChannel = member.guild.channels.cache.get(client.config.welcomeChannel);
+        const welcomeChannel = member.guild.channels.cache.get(client.config.channels.welcome);
 
         const embed = new Discord.EmbedBuilder()
             .setTitle('Member Joined')
@@ -20,7 +20,7 @@ module.exports = {
                 embeds: [embed]
             });
 
-            member.roles.add(client.config.memberRole);
+            member.roles.add(client.config.roles.member);
         } catch (error) {
             console.log('Failed to send join message/add role: ' + error)
         }

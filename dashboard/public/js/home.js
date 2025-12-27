@@ -26,6 +26,6 @@ window.onload = () => {
             document.getElementById("username").style.display = "block";
             document.getElementById("avatar").src = user.displayAvatarURL;
         })
-        .catch(console.error)
+        .catch(error => console.log(error))
     }
 }
