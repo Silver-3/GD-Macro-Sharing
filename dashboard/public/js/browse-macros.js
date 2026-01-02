@@ -1,12 +1,37 @@
+async function download(button) {
+    const channelId = button.id;
+    try {
+        const res = await fetch(`/download/${channelId}/link`);
+
+        if (!res.ok) {
+            const errorText = await res.text();
+            alert("Download failed: " + errorText);
+            return;
+        }
+
+        const url = await res.text();
+        window.location.href = url;
+    } catch (err) {
+        console.error("Download error:", err);
+        alert("An error occurred while trying to get the download link.");
+    }
+}
+
 window.addEventListener('DOMContentLoaded', () => {
     let allMacros = [];
     let renderLoopId = 0;
+
+    function escapeHTML(str) {
+        if (!str) return "";
+        const p = document.createElement('p');
+        p.textContent = str;
+        return p.innerHTML;
+    }
 
     fetch('/api/fileTypes')
         .then(res => res.json())
         .then(data => {
             const fileTypeFilter = document.getElementById("fileTypeFilter");
-
             Object.keys(data).forEach(type => {
                 const option = document.createElement("option");
                 option.value = type;
@@ -14,34 +39,17 @@ window.addEventListener('DOMContentLoaded', () => {
                 fileTypeFilter.appendChild(option);
             });
         })
-        .catch(error => {
-            console.log(error);
-        });
+        .catch(error => console.error("Error loading file types:", error));
 
     async function loadMacros() {
         try {
             const res = await fetch('/api/macros');
             const data = await res.json();
-
             allMacros = data.macros;
             filterAndRender();
         } catch (err) {
             console.log("Failed to load macros:", err);
         }
-    }
-    
-    async function download(button) {
-        const channelId = button.id;
-        const res = await fetch(`/download/${channelId}/link`);
-
-        if (!res.ok) {
-            const errorText = await res.text();
-            alert(errorText);
-            return;
-        }
-
-        const url = await res.text();
-        window.location.href = url;
     }
 
     function renderMacros(list) {
@@ -66,8 +74,8 @@ window.addEventListener('DOMContentLoaded', () => {
                 htmlChunk += `
                 <div class="macro-card" data-type="${macro.type}" data-noclip="${macro.noclip}">
                     <div class="macro-header">
-                        <h2>${macro.name}</h2>
-                        <span class="author">by ${macro.author}</span>
+                        <h2>${escapeHTML(macro.name)}</h2>
+                        <span class="author">by ${escapeHTML(macro.author)}</span>
                     </div>
 
                     <div class="macro-info">
@@ -77,16 +85,15 @@ window.addEventListener('DOMContentLoaded', () => {
                     </div>
 
                     <div class="macro-notes">
-                        ${macro.notes}
+                        ${escapeHTML(macro.notes) || "No notes provided."}
                     </div>
 
-                    <button class="download-btn" id=${macro.channelId} onclick="download(this)">Download</button>
+                    <button class="download-btn" id="${macro.channelId}" onclick="download(this)">Download</button>
                 </div>
                 `;
             }
 
             grid.insertAdjacentHTML('beforeend', htmlChunk);
-
             currentIndex = endIndex;
 
             if (currentIndex < list.length) {
@@ -107,15 +114,15 @@ window.addEventListener('DOMContentLoaded', () => {
         const noclipValue = noclipFilter.value;
 
         const filteredList = allMacros.filter(macro => {
-            const name = macro.name.toLowerCase();
-            const author = macro.author.toLowerCase();
+            const name = (macro.name || "").toLowerCase();
+            const author = (macro.author || "").toLowerCase();
             const levelId = (macro.levelId || "").toString().toLowerCase();
             const type = macro.type;
             const noclip = macro.noclip;
 
             const matchesSearch = name.includes(searchValue) || author.includes(searchValue) || levelId.includes(searchValue);
             const matchesType = typeValue === "" || type === typeValue;
-            const matchesNoclip = noclipValue === "" || (noclipValue === "yes" && noclip === "yes") || (noclipValue === "no" && noclip === "no");
+            const matchesNoclip = noclipValue === "" || noclip === noclipValue;
 
             return matchesSearch && matchesType && matchesNoclip;
         });

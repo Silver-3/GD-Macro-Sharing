@@ -5,6 +5,7 @@ const axios = require('axios');
 const path = require("path");
 const fs = require("fs");
 const session = require('express-session');
+const fileStore = require('session-file-store')(session);
 
 const db = require('../managers/database.js');
 const config = require('../config.js');
@@ -16,6 +17,10 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 app.use(session({
+  store: new fileStore({
+    path: './sessions',
+    retries: 0
+  }),
   secret: config.sessionSecret,
   resave: false,
   saveUninitialized: false,
@@ -219,21 +224,17 @@ module.exports.run = (client) => {
   // -- API Routes --
 
   app.get('/api/me', async (req, res) => {
-    if (!req.session.userId) return res.status(401).json({
-      user: null
-    });
+    if (!req.session.userId) {
+        return res.json({ user: null });
+    }
 
     try {
-      const user = await client.users.fetch(req.session.userId);
-      res.json({
-        user
-      });
+        const user = await client.users.fetch(req.session.userId);
+        res.json({ user });
     } catch (error) {
-      res.status(404).json({
-        error: 'User not found'
-      });
+        res.json({ user: null });
     }
-  });
+});
 
   app.get('/api/macros', (req, res) => {
     const macros = db.all();
