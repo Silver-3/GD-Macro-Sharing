@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const Discord = require('discord.js');
 const server = require('./dashboard/server.js');
 const db = require('./managers/database.js');

@@ -11,26 +11,13 @@
 </head>
 
 <body>
-  <nav class="topbar">
-    <div class="left">
-      <a href="/" class="logo">Home</a>
-      <a href="/submit-macro">Submit Macro</a>
-      <a href="/browse-macros">Browse Macros</a>
-    </div>
+  <%- include('partials/navbar') %>
+  <script src="/js/navbar.js"></script>
 
-    <div class="right">
-      <span id="username" class="username"></span>
-      <img class="avatar" id="avatar">
-    </div>
-  </nav>
-
-  <div id="loginModal" class="modal" style="display: none;">
-    <div class="modal-content">
-      <p>You must log in to submit a macro</p>
-      <button id="loginButton">Sign In</button>
-      <button id="returnButton" class="returnButton">Go Back</button>
-    </div>
-  </div>
+  <% if (showLoginModal) { %>
+    <%- include('partials/loginModal') %>
+  <% } %>
+  <script src="/js/loginModal.js"></script>
 
   <div class="container">
     <form id="macroForm" class="form-wrapper" action="/submit-macro" method="POST" enctype="multipart/form-data">

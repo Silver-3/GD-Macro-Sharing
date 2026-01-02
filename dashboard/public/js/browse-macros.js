@@ -1,18 +1,4 @@
-async function download(button) {
-    const channelId = button.id;
-    const res = await fetch(`/download/${channelId}/link`);
-
-    if (!res.ok) {
-        const errorText = await res.text();
-        alert(errorText);
-        return;
-    }
-
-    const url = await res.text();
-    window.location.href = url;
-}
-
-window.onload = () => {
+window.addEventListener('DOMContentLoaded', () => {
     let allMacros = [];
     let renderLoopId = 0;
 
@@ -32,34 +18,6 @@ window.onload = () => {
             console.log(error);
         });
 
-    function getCookie(name) {
-        let decodedCookie = decodeURIComponent(document.cookie);
-        let cookies = decodedCookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            let cookie = cookies[i].trim();
-            if (cookie.indexOf(name + "=") === 0) {
-                return cookie.substring(name.length + 1);
-            }
-        }
-        return "";
-    }
-
-    const signInText = document.getElementById("sign-in");
-    const userId = getCookie("userId");
-
-    if (userId) {
-        signInText.style.display = "none";
-        fetch(`/api/user/${userId}`)
-            .then(res => res.json())
-            .then(data => {
-                const user = data.user;
-                document.getElementById("username").innerText = '@' + (user?.globalName ? user.globalName : user.username);
-                document.getElementById("username").style.display = "block";
-                document.getElementById("avatar").src = user.displayAvatarURL;
-            })
-            .catch(error => console.log(error))
-    }
-
     async function loadMacros() {
         try {
             const res = await fetch('/api/macros');
@@ -70,6 +28,20 @@ window.onload = () => {
         } catch (err) {
             console.log("Failed to load macros:", err);
         }
+    }
+    
+    async function download(button) {
+        const channelId = button.id;
+        const res = await fetch(`/download/${channelId}/link`);
+
+        if (!res.ok) {
+            const errorText = await res.text();
+            alert(errorText);
+            return;
+        }
+
+        const url = await res.text();
+        window.location.href = url;
     }
 
     function renderMacros(list) {
@@ -156,4 +128,4 @@ window.onload = () => {
     noclipFilter.addEventListener("change", filterAndRender);
 
     loadMacros();
-}
+});

@@ -4,12 +4,27 @@ const multer = require("multer");
 const axios = require('axios');
 const path = require("path");
 const fs = require("fs");
+const session = require('express-session');
 
 const db = require('../managers/database.js');
 const config = require('../config.js');
 
 const app = express();
 const port = config.urls.base.split(':').pop().replace('/', '');
+
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+app.use(session({
+  secret: config.sessionSecret,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: false,
+    httpOnly: true,
+    maxAge: 1000 * 60 * 60 * 24 * 7
+  }
+}));
 
 const macrosFolder = path.join(__dirname, "../macros");
 if (!fs.existsSync(macrosFolder)) {
@@ -38,18 +53,6 @@ const upload = multer({
   storage
 });
 
-function getCookie(req, name) {
-  const cookies = req.headers.cookie || "";
-  const cookieArray = cookies.split(';');
-  for (let i = 0; i < cookieArray.length; i++) {
-    let cookie = cookieArray[i].trim();
-    if (cookie.startsWith(name + "=")) {
-      return cookie.substring(name.length + 1);
-    }
-  }
-  return "";
-}
-
 async function fetchLevel(levelId) {
   try {
     const response = await axios.get(`https://history.geometrydash.eu/api/v1/level/${encodeURIComponent(levelId)}/`, {
@@ -71,7 +74,7 @@ async function fetchLevel(levelId) {
       };
     }
   } catch (error) {
-    return { 
+    return {
       found: false
     };
   }
@@ -89,28 +92,44 @@ module.exports.run = (client) => {
   app.use(bodyParser.json());
   app.use(express.static(path.join(__dirname, "public")));
 
+  // -- Website Routes --
+
   app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, "views", "home.html"));
+    res.render('home');
   });
 
   app.get('/auth', (req, res) => {
-    res.sendFile(path.join(__dirname, "views", "auth.html"));
+    res.render('auth');
   });
 
   app.get('/sign-in', (req, res) => {
-    res.sendFile(path.join(__dirname, "views", "sign-in.html"));
+    res.render('sign-in');
   });
 
   app.get('/browse-macros', (req, res) => {
-    res.sendFile(path.join(__dirname, "views", "browse-macros.html"));
+    res.render('browse-macros');
   });
 
   app.get("/submit-macro", (req, res) => {
-    res.sendFile(path.join(__dirname, "views", "submit-macro.html"));
+    const userID = req.session.userId;
+
+    if (!userID) {
+      return res.render('submit-macro', {
+        showLoginModal: true
+      });
+    }
+
+    res.render('submit-macro', {
+      showLoginModal: false
+    });
+  });
+
+  app.get("/macro-submitted", (req, res) => {
+    res.render('macro-submitted');
   });
 
   app.post("/submit-macro", upload.single("macroFile"), async (req, res) => {
-    const userID = getCookie(req, "userId");
+    const userID = req.session.userId;
 
     let {
       name,
@@ -197,16 +216,15 @@ module.exports.run = (client) => {
     }
   });
 
-  app.get("/macro-submitted", (req, res) => {
-    res.sendFile(path.join(__dirname, "views", "macro-submitted.html"));
-  });
+  // -- API Routes --
 
-  app.get('/api/user/:userID', async (req, res) => {
-    const userID = req.params.userID;
+  app.get('/api/me', async (req, res) => {
+    if (!req.session.userId) return res.status(401).json({
+      user: null
+    });
 
     try {
-      const user = await client.users.fetch(userID);
-
+      const user = await client.users.fetch(req.session.userId);
       res.json({
         user
       });
@@ -249,6 +267,46 @@ module.exports.run = (client) => {
   app.get('/api/fileTypes', async (req, res) => {
     res.json(config.fileTypes);
   });
+
+  app.get('/api/login-session', (req, res) => {
+    const { userId } = req.body;
+    if (!userId) return res.status(400).send("No user ID found");
+
+    req.session.userId = userId;
+    res.json({ sucess: true });
+  });
+
+  app.post('/api/auth/callback', async (req, res) => {
+    const { code } = req.body;
+
+    try {
+      const tokenResponse = await axios.post('https://discord.com/api/oauth2/token', new URLSearchParams({
+        client_id: client.user.id,
+        client_secret: config.clientSecret,
+        grant_type: 'authorization_code',
+        code: code,
+        redirect_uri: config.urls.base + 'auth',
+      }).toString(), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      });
+
+      const accessToken = tokenResponse.data.access_token;
+
+      const userResponse = await axios.get('https://discord.com/api/users/@me', {
+        headers: {
+          authorization: `Bearer ${accessToken}`
+        }
+      });
+
+      req.session.userId = userResponse.data.id;
+      res.json({ success: true });
+    } catch (error) {
+      console.error("[ERROR] Discord Auth Error:", error.response?.data || error.message);
+      res.status(500).json({ success: false, error: "Authentication failed" });
+    }
+  })
 
   app.listen(port, () => {
     console.log(`[INFO] Server is running at ${config.urls.base}`);
