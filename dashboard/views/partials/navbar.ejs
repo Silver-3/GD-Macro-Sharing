@@ -6,8 +6,19 @@
     </div>
 
     <div class="right">
-        <a href="/sign-in" id="sign-in">Sign in</a>
-        <span id="username" class="username" style="display: none;"></span>
-        <img class="avatar" id="avatar" src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png">
+        <a href="/sign-in" id="sign-in" style="display: none;">Sign in</a>
+
+        <div class="settings-menu" id="settings-menu" style="display: none; position: relative;">
+            <div class="user-trigger" id="user-trigger" style="display: flex; align-items: center; cursor: pointer;">
+                <span id="username" class="username"></span>
+                <img class="avatar" id="avatar" src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png">
+            </div>
+
+            <div id="settings-dropdown" class="settings-dropdown">
+                <button id="logout-button" class="logout-button">Log Out</button>
+            </div>
+        </div>
     </div>
 </nav>
+
+<script src="/js/navbar.js"></script>

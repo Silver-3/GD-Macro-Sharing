@@ -2,6 +2,7 @@ node_modules/
 logs/
 macros/
 backup/
+sessions/
 test/
 package-lock.json
 *.env

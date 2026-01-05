@@ -17,9 +17,45 @@ async function download(button) {
     }
 }
 
+function toggleInfo(element, userId) {
+    const panel = element.parentElement.querySelector('.macro-info-panel');
+    const isAlreadyOpen = panel.style.display === 'flex';
+
+    document.querySelectorAll('.macro-info-panel').forEach(p => {
+        p.style.display = 'none';
+    });
+
+    if (!isAlreadyOpen) {
+        panel.style.display = 'flex';
+
+        const usernameText = panel.querySelector(".macroUploaderName");
+        const avatarImage = panel.querySelector(".macroUploaderAvatar");
+
+        if (usernameText.innerText === "") {
+            fetch(`/api/users/${userId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.user) {
+                        usernameText.innerText = '@' + (data.user.globalName || data.user.username);
+                        usernameText.style.display = "inline";
+                        avatarImage.src = data.user.displayAvatarURL;
+                    }
+                })
+                .catch(err => console.log("User fetch error:", err));
+        }
+    }
+}
+
 window.addEventListener('DOMContentLoaded', () => {
     let allMacros = [];
+    let serverId = "";
     let renderLoopId = 0;
+
+    fetch('/api/config')
+        .then(res => res.json())
+        .then(data => {
+            serverId = data.serverId;
+        });
 
     function escapeHTML(str) {
         if (!str) return "";
@@ -72,7 +108,29 @@ window.addEventListener('DOMContentLoaded', () => {
                 const macro = list[i];
 
                 htmlChunk += `
-                <div class="macro-card" data-type="${macro.type}" data-noclip="${macro.noclip}">
+                <div class="macro-card" data-type="${macro.type}" data-noclip="${macro.noclip}" style="position: relative;">
+                    <div class="info-trigger" onclick="toggleInfo(this, '${macro.userId}')" data-tooltip="Macro Details">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                            <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+                        </svg>
+                    </div>
+
+                    <div class="macro-info-panel" style="display: none;">
+                        <div class="panel-content">
+                            <h3>Macro Details</h3>
+            
+                            <p style="display: flex; align-items: center; justify-content: center; gap: 8px; margin: 10px 0;">
+                                <strong>Uploader:</strong>
+                                <span class="macroUploaderName username"></span> 
+                                <img class="macroUploaderAvatar avatar" src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; display: block;">
+                            </p>
+                            <p id="threadId"><strong>Thread: </strong><a style="color: #5865F2; font-weight: bold; text-decoration: none;" target="_blank" rel="noopener noreferrer" href="https://discord.com/channels/${serverId}/${macro.channelId}">View on Discord</a></p>
+
+                            <button onclick="this.closest('.macro-info-panel').style.display='none'"">Close</button>
+                        </div>
+                    </div>
+
                     <div class="macro-header">
                         <h2>${escapeHTML(macro.name)}</h2>
                         <span class="author">by ${escapeHTML(macro.author)}</span>

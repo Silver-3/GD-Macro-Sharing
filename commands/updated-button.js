@@ -33,3 +33,5 @@ module.exports.run = async (interaction, client) => {
 module.exports.data = new SlashCommand()
     .setName('updated-button')
     .setDescription('Get an updated button to download the macro')
+
+module.exports.data.devOnly = false;

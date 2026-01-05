@@ -1,7 +1,7 @@
 const SlashCommand = require('@discordjs/builders').SlashCommandBuilder;
 const Discord = require('discord.js');
 const server = require('../dashboard/server.js');
-const db = require('../managers/database.js');
+const db = require('../handlers/database.js');
 
 /**
  * @param {Discord.Client} client 
@@ -84,8 +84,9 @@ module.exports.run = async (interaction, client) => {
 module.exports.data = new SlashCommand()
     .setName('edit-channel')
     .setDescription('Edit the channel info')
-    .setDefaultMemberPermissions(Discord.PermissionFlagsBits.Administrator)
     .addStringOption(option => option
         .setName("id")
         .setDescription("Level id")
         .setRequired(true))
+
+module.exports.data.devOnly = true;

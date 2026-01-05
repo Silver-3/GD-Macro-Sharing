@@ -2,7 +2,7 @@ require('dotenv').config();
 
 const Discord = require('discord.js');
 const server = require('./dashboard/server.js');
-const db = require('./managers/database.js');
+const db = require('./handlers/database.js');
 const config = require('./config.js');
 
 const client = new Discord.Client({

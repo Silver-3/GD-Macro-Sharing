@@ -121,7 +121,6 @@ module.exports.run = async (interaction, client) => {
 module.exports.data = new SlashCommand()
     .setName('setup')
     .setDescription('Setup for several things')
-    .setDefaultMemberPermissions(Discord.PermissionFlagsBits.Administrator)
     .addSubcommand(subcommand => subcommand
         .setName('macros')
         .setDescription('Setup macro submittion'))
@@ -134,3 +133,5 @@ module.exports.data = new SlashCommand()
     .addSubcommand(subcommand => subcommand
         .setName("ticket")
         .setDescription("Setup event ticket"))
+
+module.exports.data.devOnly = true;

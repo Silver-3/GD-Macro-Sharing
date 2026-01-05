@@ -1,6 +1,6 @@
 const SlashCommand = require('@discordjs/builders').SlashCommandBuilder;
 const Discord = require('discord.js');
-const db = require('../managers/database.js');
+const db = require('../handlers/database.js');
 const fileTypes = require('../config.js').fileTypes;
 
 /**
@@ -113,3 +113,5 @@ module.exports.data = new SlashCommand()
             name: 'No',
             value: 'no'
         }))
+
+module.exports.data.devOnly = false;

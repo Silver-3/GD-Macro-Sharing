@@ -1,6 +1,6 @@
 const SlashCommand = require('@discordjs/builders').SlashCommandBuilder;
 const Discord = require('discord.js');
-const db = require('../managers/database.js');
+const db = require('../handlers/database.js');
 const fs = require('fs');
 const path = require('path');
 
@@ -101,7 +101,8 @@ module.exports.run = async (interaction, client) => {
 module.exports.data = new SlashCommand()
     .setName('delete-macro')
     .setDescription('Delete a macro if it is a duplicate')
-    .setDefaultMemberPermissions(Discord.PermissionFlagsBits.Administrator)
     .addChannelOption(option => option
         .setName("channel")
         .setDescription("Channel to delete"))
+
+module.exports.data.devOnly = true;

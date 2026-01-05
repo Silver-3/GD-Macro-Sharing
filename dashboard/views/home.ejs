@@ -2,8 +2,8 @@
 <html lang="en">
 
 <head>
-    <title>GD Macro Sharing</title>
-    <link rel="icon" href="/assets/logo.ico" type="image/x-icon">
+  <title>GD Macro Sharing</title>
+  <link rel="icon" href="/assets/logo.ico" type="image/x-icon">
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,12 +12,21 @@
 
 <body>
   <%- include('partials/navbar') %>
-  <script src="/js/navbar.js"></script>
 
   <section class="intro">
     <h1>Welcome to GD Macro Sharing</h1>
     <p>Here you can upload your Geometry Dash macros or browse macros other users have created</p>
   </section>
+
+  <section class="leaderboard-section">
+    <h2>Macro Upload Leaderboard</h2>
+    <div id="leaderboard-container">
+      <p>Loading rankings...</p>
+    </div>
+    <p id="total-macros" style="font-size: 0.8em; color: #888; margin-top: 15px;"></p>
+  </section>
+
+  <script src="/js/home.js"></script>
 </body>
 
 </html>

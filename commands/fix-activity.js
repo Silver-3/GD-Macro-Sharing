@@ -16,4 +16,5 @@ module.exports.run = async (interaction, client) => {
 module.exports.data = new SlashCommand()
     .setName('fix-activity')
     .setDescription('Fix bot activity')
-    .setDefaultMemberPermissions(Discord.PermissionFlagsBits.Administrator)
+
+module.exports.data.devOnly = true;

@@ -7,7 +7,7 @@ const fs = require("fs");
 const session = require('express-session');
 const fileStore = require('session-file-store')(session);
 
-const db = require('../managers/database.js');
+const db = require('../handlers/database.js');
 const config = require('../config.js');
 
 const app = express();
@@ -22,7 +22,7 @@ app.use(session({
     retries: 0
   }),
   secret: config.sessionSecret,
-  resave: false,
+  resave: true,
   saveUninitialized: false,
   cookie: {
     secure: false,
@@ -65,17 +65,12 @@ async function fetchLevel(levelId) {
     });
 
     if (response.status === 200 && response.data && response.data.sucess !== false) {
-      const {
-        records,
-        cache_level_name,
-        cache_username
-      } = response.data;
-      const data = records.at(-1);
+      const data = response.data.records.at(-1);
 
       return {
         found: true,
-        name: data.level_name || cache_level_name,
-        author: data.username || cache_username
+        name: response.data.cache_level_name || data.level_name,
+        author: response.data.cache_username || data.username
       };
     }
   } catch (error) {
@@ -87,6 +82,19 @@ async function fetchLevel(levelId) {
   return {
     found: false
   };
+}
+
+async function tallyMacros() {
+  const rows = await db.all();
+  const counts = new Map();
+
+  for (const row of rows) {
+    const uid = row.userId || row.userID;
+    if (!uid) continue;
+
+    counts.set(uid, (counts.get(uid) || 0) + 1);
+  }
+  return counts;
 }
 
 module.exports.run = (client) => {
@@ -198,16 +206,13 @@ module.exports.run = (client) => {
       if (!channel) return res.status(404).send(`Macro thread not found: [${channelId}]`);
 
       const messages = await channel.messages.fetch({
-        limit: 2
+        limit: 10
       });
-      const sorted = messages.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
-      const message = Array.from(sorted.values())[1];
+      const message = messages.find(msg => msg.attachments.size > 0);
 
-      if (!message) return res.status(404).send(`Macro message not found: [${channelId}]`);
+      if (!message) return res.status(404).send(`Macro attachment not found: [${channelId}]`);
 
       const attachment = message.attachments.first();
-      if (!attachment) return res.status(404).send(`Macro attachment not found: [${channelId}]`);
-
       return res.send(attachment.url);
     } else {
       if (!fs.existsSync(macroFolder)) return res.status(404).send("Macro folder not found. Try run /updated-button in discord");
@@ -225,16 +230,49 @@ module.exports.run = (client) => {
 
   app.get('/api/me', async (req, res) => {
     if (!req.session.userId) {
-        return res.json({ user: null });
+      return res.json({
+        user: null
+      });
     }
 
     try {
-        const user = await client.users.fetch(req.session.userId);
-        res.json({ user });
+      const user = await client.users.fetch(req.session.userId);
+      res.json({
+        user
+      });
     } catch (error) {
-        res.json({ user: null });
+      res.json({
+        user: null
+      });
     }
-});
+  });
+
+  app.get('/api/logout', (req, res) => {
+    req.session.destroy((error) => {
+      if (error) {
+        console.log(`[ERROR] Logout error: `, error);
+        return res.status(500).json({ success: false, errror: "Could not log out" });
+      }
+
+      res.clearCookie('connect.sid');
+      res.json({ success: true });
+    })
+  });
+
+  app.get('/api/users/:userID', async (req, res) => {
+    const userId = req.params.userID;
+
+    try {
+      const user = await client.users.fetch(userId);
+      res.json({
+        user
+      });
+    } catch (error) {
+      res.json({
+        user: null
+      });
+    }
+  });
 
   app.get('/api/macros', (req, res) => {
     const macros = db.all();
@@ -259,26 +297,40 @@ module.exports.run = (client) => {
     }
   });
 
-  app.get('/api/oauth2', async (req, res) => {
+  app.get('/api/oauth2', (req, res) => {
     res.json({
       url: config.urls.oauth2
     });
   });
 
-  app.get('/api/fileTypes', async (req, res) => {
+  app.get('/api/config', (req, res) => {
+    res.json({
+      serverId: config.serverId,
+      channels: config.channels,
+      roles: config.roles
+    });
+  });
+
+  app.get('/api/fileTypes', (req, res) => {
     res.json(config.fileTypes);
   });
 
   app.get('/api/login-session', (req, res) => {
-    const { userId } = req.body;
+    const {
+      userId
+    } = req.body;
     if (!userId) return res.status(400).send("No user ID found");
 
     req.session.userId = userId;
-    res.json({ sucess: true });
+    res.json({
+      sucess: true
+    });
   });
 
   app.post('/api/auth/callback', async (req, res) => {
-    const { code } = req.body;
+    const {
+      code
+    } = req.body;
 
     try {
       const tokenResponse = await axios.post('https://discord.com/api/oauth2/token', new URLSearchParams({
@@ -302,12 +354,60 @@ module.exports.run = (client) => {
       });
 
       req.session.userId = userResponse.data.id;
-      res.json({ success: true });
+      res.json({
+        success: true
+      });
     } catch (error) {
       console.error("[ERROR] Discord Auth Error:", error.response?.data || error.message);
-      res.status(500).json({ success: false, error: "Authentication failed" });
+      res.status(500).json({
+        success: false,
+        error: "Authentication failed"
+      });
     }
-  })
+  });
+
+  app.get('/api/leaderboard', async (req, res) => {
+    try {
+      const counts = await tallyMacros();
+
+      const sorted = [...counts.entries()]
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 10);
+
+      const totalMacros = [...counts.values()].reduce((a, b) => a + b, 0);
+
+      const leaderboard = await Promise.all(sorted.map(async ([userID, total]) => {
+        try {
+          const user = await client.users.fetch(userID);
+          return {
+            username: user.globalName || user.username,
+            avatar: user.displayAvatarURL({
+              size: 64
+            }),
+            count: total,
+            isMe: userID === req.session.userId
+          };
+        } catch {
+          return {
+            username: "Unknown User",
+            avatar: null,
+            count: total,
+            isMe: false
+          };
+        }
+      }));
+
+      res.json({
+        leaderboard,
+        totalMacros
+      });
+    } catch (error) {
+      console.error("Leaderboard API Error:", error);
+      res.status(500).json({
+        error: "Failed to load leaderboard"
+      });
+    }
+  });
 
   app.listen(port, () => {
     console.log(`[INFO] Server is running at ${config.urls.base}`);

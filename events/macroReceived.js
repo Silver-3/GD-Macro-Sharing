@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
 const fs = require('fs');
 const path = require('path');
-const db = require('../managers/database.js');
+const db = require('../handlers/database.js');
 const macros = new Set();
 
 module.exports = {
