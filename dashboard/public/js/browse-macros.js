@@ -55,14 +55,7 @@ window.addEventListener('DOMContentLoaded', () => {
         .then(res => res.json())
         .then(data => {
             serverId = data.serverId;
-        });
-
-    function escapeHTML(str) {
-        if (!str) return "";
-        const p = document.createElement('p');
-        p.textContent = str;
-        return p.innerHTML;
-    }
+        })
 
     fetch('/api/fileTypes')
         .then(res => res.json())
@@ -75,7 +68,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 fileTypeFilter.appendChild(option);
             });
         })
-        .catch(error => console.error("Error loading file types:", error));
+        .catch(error => console.error("Error loading file types:", error))
 
     async function loadMacros() {
         try {
@@ -132,8 +125,8 @@ window.addEventListener('DOMContentLoaded', () => {
                     </div>
 
                     <div class="macro-header">
-                        <h2>${escapeHTML(macro.name)}</h2>
-                        <span class="author">by ${escapeHTML(macro.author)}</span>
+                        <h2>${macro.name.replace(/_/g, ' ')}</h2>
+                        <span class="author">by ${macro.author}</span>
                     </div>
 
                     <div class="macro-info">
@@ -143,7 +136,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     </div>
 
                     <div class="macro-notes">
-                        ${escapeHTML(macro.notes) || ""}
+                        ${macro.notes || ""}
                     </div>
 
                     <button class="download-btn" id="${macro.channelId}" onclick="download(this)">Download</button>
@@ -168,17 +161,24 @@ window.addEventListener('DOMContentLoaded', () => {
 
     function filterAndRender() {
         const searchValue = searchInput.value.toLowerCase();
+        const normalizedSearch = searchValue.replace(/[_\s]/g, '');
+
         const typeValue = fileTypeFilter.value;
         const noclipValue = noclipFilter.value;
 
         const filteredList = allMacros.filter(macro => {
-            const name = (macro.name || "").toLowerCase();
+            const rawName = (macro.name || "").toLowerCase();
+            const normalizedName = rawName.replace(/[_\s]/g, '');
+
             const author = (macro.author || "").toLowerCase();
             const levelId = (macro.levelId || "").toString().toLowerCase();
             const type = macro.type;
             const noclip = macro.noclip;
 
-            const matchesSearch = name.includes(searchValue) || author.includes(searchValue) || levelId.includes(searchValue);
+            const matchesSearch = normalizedName.includes(normalizedSearch) ||
+                author.includes(searchValue) ||
+                levelId.includes(searchValue);
+
             const matchesType = typeValue === "" || type === typeValue;
             const matchesNoclip = noclipValue === "" || noclip === noclipValue;
 

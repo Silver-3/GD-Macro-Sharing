@@ -26,9 +26,18 @@ module.exports.run = async (interaction, client) => {
             if (type && macro.type !== type) return false;
             if (noclip !== null && (macro.noclip.toLowerCase() !== noclip)) return false;
 
-            if (by == 'any') return (macro.name.toLowerCase().includes(search) || macro.author.toLowerCase().includes(search) || String(macro.levelId) == search || String(macro.id) == search);
-            else if (by == 'name') return macro.name.toLowerCase().includes(search);
-            else if (by == 'author') return macro.author.toLowerCase().includes(search);
+            const normalize = (str) => str.toLowerCase().replace(/[_\s]/g, '');
+            const normalizedSearch = normalize(search);
+
+            if (by == 'any') {
+                return (
+                    normalize(macro.name).includes(normalizedSearch) ||
+                    normalize(macro.author).includes(normalizedSearch) ||
+                    String(macro.levelId) == search ||
+                    String(macro.id) == search
+                );
+            } else if (by == 'name') return normalize(macro.name).includes(normalizedSearch);
+            else if (by == 'author') return normalize(macro.author).includes(normalizedSearch);
             else if (by == 'id') return String(macro.levelId) == search || String(macro.id) == search;
 
             return false;
@@ -55,7 +64,7 @@ module.exports.run = async (interaction, client) => {
             return {
                 name: channel ? channel.name : 'Unknown Channel',
                 value: `<#${channel.id}> (${macro.type})`
-            };  
+            };
         });
 
         const fields = await Promise.all(fieldPromises);
@@ -82,7 +91,7 @@ module.exports.data = new SlashCommand()
         .addChoices({
             name: 'Any',
             value: 'any'
-        },{
+        }, {
             name: 'Name',
             value: 'name'
         }, {
