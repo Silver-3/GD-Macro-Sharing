@@ -143,7 +143,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     </div>
 
                     <div class="macro-notes">
-                        ${escapeHTML(macro.notes) || "No notes provided."}
+                        ${escapeHTML(macro.notes) || ""}
                     </div>
 
                     <button class="download-btn" id="${macro.channelId}" onclick="download(this)">Download</button>
