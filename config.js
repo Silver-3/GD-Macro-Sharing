@@ -38,7 +38,7 @@ module.exports = {
 
     // -- Expected File Types --
     fileTypes: {
-        gdr: ["gdr", "gdr.json"],
+        gdr: ["gdr", "gdr2", "gdr.json"],
         mhr: ["mhr"],
         re: ["re", "re2", "re3"],
         xd: ["xd"],
