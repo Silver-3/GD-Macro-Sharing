@@ -19,7 +19,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(session({
   store: new fileStore({
     path: './sessions',
-    retries: 0
+    retries: 0,
+    logFn: function() {}
   }),
   secret: config.sessionSecret,
   resave: true,
