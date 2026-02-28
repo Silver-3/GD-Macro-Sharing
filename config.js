@@ -12,6 +12,7 @@ module.exports = {
     // -- Channel IDs --
     channels: {
         gdr: "1321829383270436947",
+        gdr2: "1477232439570075650",
         mhr: "1321828118595502090",
         re: "1321956143521595412",
         xd: "1321829630780375040",
@@ -38,7 +39,8 @@ module.exports = {
 
     // -- Expected File Types --
     fileTypes: {
-        gdr: ["gdr", "gdr2", "gdr.json"],
+        gdr: ["gdr", "gdr.json"],
+        gdr2: ["gdr2"],
         mhr: ["mhr"],
         re: ["re", "re2", "re3"],
         xd: ["xd"],
