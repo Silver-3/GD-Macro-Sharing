@@ -24,11 +24,22 @@ module.exports = {
                     console.log(`[ERROR] Failed to time out member: ${error}`);
                 }
 
+                let loggedContent = message.content || "";
+
+                if (message.attachments && message.attachments.size > 0) {
+                    const attachmentNames = message.attachments.map(a => `📎 [Attachment: ${a.name}]`).join('\n');
+                    loggedContent = loggedContent ? `${loggedContent}\n\n${attachmentNames}` : attachmentNames;
+                }
+
+                if (loggedContent.length > 4096) {
+                    loggedContent = loggedContent.substring(0, 4093) + "...";
+                }
+
                 const channel = await message.guild.channels.fetch(client.config.channels.automod);
                 const automodEmbed = new Discord.EmbedBuilder()
                     .setAuthor({ name: member.user.username, iconURL: member.displayAvatarURL()})
-                    .setDescription(message.content)
-                    .setFooter({text: `3 or more links sent • Possible scam • 10 min timeout`})
+                    .setDescription(loggedContent)
+                    .setFooter({text: (links && links.length >= 3) ? "3+ links sent" : "3+ attachments sent"})
 
                 channel.send({
                     content: `Blocked a message in <#${message.channel.id}> `,
