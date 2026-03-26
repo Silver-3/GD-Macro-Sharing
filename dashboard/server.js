@@ -61,28 +61,69 @@ const upload = multer({
 
 async function fetchLevel(levelId) {
   try {
-    const response = await axios.get(`https://history.geometrydash.eu/api/v1/level/${encodeURIComponent(levelId)}/`, {
-      timeout: 8000
-    });
+    const response = await axios.get(
+      `https://history.geometrydash.eu/api/v1/level/${encodeURIComponent(levelId)}/`,
+      { timeout: 8000 }
+    );
 
-    if (response.status === 200 && response.data && response.data.sucess !== false) {
+    if (response.status === 200 && response.data?.sucess !== false) {
       const data = response.data.records.at(-1);
-
       return {
         found: true,
         name: response.data.cache_level_name || data.level_name,
-        author: response.data.cache_username || data.username
+        author: response.data.cache_username || data.username,
       };
     }
-  } catch (error) {
-    return {
-      found: false
-    };
-  }
+  } catch {}
 
-  return {
-    found: false
-  };
+  try {
+    const params = new URLSearchParams({
+      gameVersion: '22',
+      binaryVersion: '42',
+      gdw: '0',
+      str: levelId,
+      type: '0',
+      secret: 'Wmfd2893gb7',
+    });
+
+    const response = await axios.post(
+      'https://www.boomlings.com/database/getGJLevels21.php',
+      params.toString(),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'User-Agent': '',
+          'Accept-Encoding': '',
+          'Accept': '',
+        },
+        timeout: 8000,
+        decompress: false,
+      }
+    );
+
+    if (!response.data || response.data === '-1') return { found: false };
+
+    const [levelsRaw, creatorsRaw] = response.data.split('#');
+
+    const levelData = {};
+    const parts = levelsRaw.split(':');
+    for (let i = 0; i < parts.length - 1; i += 2) {
+      levelData[parts[i]] = parts[i + 1];
+    }
+
+    const creatorMap = {};
+    creatorsRaw?.split('|').forEach(entry => {
+      const [playerID, username] = entry.split(':');
+      creatorMap[playerID] = username;
+    });
+
+    const name = levelData['2'];
+    const author = creatorMap[levelData['6']] ?? 'Unknown';
+
+    if (name) return { found: true, name, author };
+  } catch {}
+
+  return { found: false };
 }
 
 async function tallyMacros() {
