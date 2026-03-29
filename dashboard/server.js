@@ -165,25 +165,25 @@ module.exports.run = (client) => {
     res.render('browse-macros');
   });
 
-  app.get("/submit-macro", (req, res) => {
+  app.get("/upload-macro", (req, res) => {
     const userID = req.session.userId;
 
     if (!userID) {
-      return res.render('submit-macro', {
+      return res.render('upload-macro', {
         showLoginModal: true
       });
     }
 
-    res.render('submit-macro', {
+    res.render('upload-macro', {
       showLoginModal: false
     });
   });
 
-  app.get("/macro-submitted", (req, res) => {
-    res.render('macro-submitted');
+  app.get("/macro-uploaded", (req, res) => {
+    res.render('macro-uploaded');
   });
 
-  app.post("/submit-macro", upload.single("macroFile"), async (req, res) => {
+  app.post("/upload-macro", upload.single("macroFile"), async (req, res) => {
     const userID = req.session.userId;
 
     let {
@@ -232,7 +232,7 @@ module.exports.run = (client) => {
     };
 
     client.emit("macroReceived", fileInfo);
-    res.redirect('/macro-submitted');
+    res.redirect('/macro-uploaded');
   });
 
   app.get("/download/:channelId/:option", async (req, res) => {

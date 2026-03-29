@@ -24,18 +24,18 @@ module.exports.run = async (interaction, client) => {
         .setColor('Blurple')
 
     if (subcommand == 'macros') {
-        const submitEmbed = new Discord.EmbedBuilder()
-            .setTitle('Click below to submit a macro')
+        const uploadEmbed = new Discord.EmbedBuilder()
+            .setTitle('Click below to upload a macro')
             .setDescription(`\n\n-# If you need help, please DM <@${client.config.devId}>`)
             .setColor('Blurple')
 
-        const submitButton = new Discord.ButtonBuilder()
-            .setLabel('Submit a macro')
+        const uploadButton = new Discord.ButtonBuilder()
+            .setLabel('Upload a macro')
             .setStyle(Discord.ButtonStyle.Link)
-            .setURL(client.config.urls.base + 'submit-macro');
+            .setURL(client.config.urls.base + 'upload-macro');
 
-        const submitActionRow = new Discord.ActionRowBuilder()
-            .addComponents(submitButton)
+        const uploadActionRow = new Discord.ActionRowBuilder()
+            .addComponents(uploadButton)
 
         const searchEmbed = new Discord.EmbedBuilder()
             .setTitle('Click below to search for a macro')
@@ -51,8 +51,8 @@ module.exports.run = async (interaction, client) => {
             .addComponents(searchButton)
 
         interaction.channel.send({
-            embeds: [submitEmbed],
-            components: [submitActionRow]
+            embeds: [uploadEmbed],
+            components: [uploadActionRow]
         });
         interaction.channel.send('_ _');
         interaction.channel.send({

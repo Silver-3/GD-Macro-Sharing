@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-  <title>Submit Macro</title>
+  <title>Upload Macro</title>
   <link rel="icon" href="/assets/logo.ico" type="image/x-icon">
 
   <meta charset="UTF-8">
@@ -18,9 +18,9 @@
   <% } %>
 
   <div class="container">
-    <form id="macroForm" class="form-wrapper" action="/submit-macro" method="POST" enctype="multipart/form-data">
+    <form id="macroForm" class="form-wrapper" action="/upload-macro" method="POST" enctype="multipart/form-data">
       <div id="step1">
-        <h1>Submit Macro</h1>
+        <h1>Macro details</h1>
         <div class="form-group">
           <label for="id">Level ID</label>
           <input type="number" id="id" name="id" required>
@@ -40,7 +40,7 @@
       </div>
 
       <div id="step2" style="display:none;">
-        <h1>Submit Macro</h1>
+        <h1>Macro details</h1>
         <div class="form-group">
           <label for="noclip">Is Noclip Required?</label>
           <div class="noclip-toggle-group">
@@ -61,7 +61,7 @@
           <div class="fileType" id="fileType"></div>
         </div>
         <div class="form-group">
-          <button type="submit" id="submitButton" disabled>Submit</button>
+          <button type="submit" id="submitButton" disabled>Upload</button>
         </div>
       </div>
     </form>
