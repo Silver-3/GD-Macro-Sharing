@@ -59,11 +59,11 @@ module.exports.run = async (interaction, client) => {
         results = results.slice(0, 25);
 
         const fieldPromises = results.map(async macro => {
-            const channel = await interaction.guild.channels.fetch(macro.channelId);
+            const channel = interaction.guild.channels.cache.get(macro.channelId) ?? await interaction.guild.channels.fetch(macro.channelId).catch(() => null);
 
             return {
                 name: channel ? channel.name : 'Unknown Channel',
-                value: `<#${channel.id}> (${macro.type})`
+                value: channel ? `<#${channel.id}> (${macro.type})` : `Unknown (${macro.type})`
             };
         });
 
@@ -74,7 +74,8 @@ module.exports.run = async (interaction, client) => {
             embeds: [embed]
         });
     } catch (error) {
-        console.log("Error in search command:", error);
+        console.log("Error in search command:");
+        console.error(error);
         interaction.editReply({
             content: 'Something went wrong with searching the database.'
         });
