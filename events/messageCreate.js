@@ -14,9 +14,11 @@ module.exports = {
         const links = message.content.match(urlRegex);
 
         if ((links && links.length >= 3) || (message.attachments && message.attachments.size >= 3)) {
+            const member = message.member;
+            if (member.roles.cache.has(client.config.roles.img)) return;
+
             try {
                 await message.delete();
-                const member = await message.guild.members.fetch(message.author.id);
 
                 try {
                 	await member.timeout(10 * 60 * 1000, "Possible scam");
