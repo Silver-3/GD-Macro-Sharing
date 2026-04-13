@@ -35,9 +35,11 @@ module.exports = {
 
     // -- Links --
     urls: {
-        base: "http://45.61.162.33:8470/",
+        full: "https://gd.584924.xyz/",
+        base: "gd.584924.xyz",
+        port: 8470,
         invite: "https://discord.gg/H3vHJpz7Mj",
-        oauth2: "https://discord.com/oauth2/authorize?client_id=1383593364582174790&response_type=code&redirect_uri=http%3A%2F%2F45.61.162.33%3A8470%2Fauth&scope=identify",
+        oauth2: "https://discord.com/oauth2/authorize?client_id=1383593364582174790&response_type=code&redirect_uri=https%3A%2F%2Fgd.584924.xyz%2Fauth&scope=identify",
     },
 
     // -- Expected File Types --

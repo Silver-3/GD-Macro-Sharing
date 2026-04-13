@@ -57,7 +57,7 @@ module.exports = {
                 const filePath = path.join(folder, macro.originalFileName);
                 if (fs.existsSync(macro.filePath)) fs.renameSync(macro.filePath, filePath);
 
-                const downloadedMacro = `${client.config.urls.base}download/${thread.id}/download`;
+                const downloadedMacro = `${client.config.urls.full}download/${thread.id}/download`;
 
                 const Button = new Discord.ButtonBuilder()
                     .setLabel('Download Macro (above 10mb)')

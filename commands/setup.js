@@ -32,7 +32,7 @@ module.exports.run = async (interaction, client) => {
         const uploadButton = new Discord.ButtonBuilder()
             .setLabel('Upload a macro')
             .setStyle(Discord.ButtonStyle.Link)
-            .setURL(client.config.urls.base + 'upload-macro');
+            .setURL(client.config.urls.full + 'upload-macro');
 
         const uploadActionRow = new Discord.ActionRowBuilder()
             .addComponents(uploadButton)
@@ -45,7 +45,7 @@ module.exports.run = async (interaction, client) => {
         const searchButton = new Discord.ButtonBuilder()
             .setLabel('Browse Macros')
             .setStyle(Discord.ButtonStyle.Link)
-            .setURL(client.config.urls.base + 'browse-macros');
+            .setURL(client.config.urls.full + 'browse-macros');
 
         const searchActionRow = new Discord.ActionRowBuilder()
             .addComponents(searchButton)

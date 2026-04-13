@@ -11,7 +11,17 @@ const db = require('../handlers/database.js');
 const config = require('../config.js');
 
 const app = express();
-const port = config.urls.base.split(':').pop().replace('/', '');
+const port = config.urls.port;
+
+app.use((req, res, next) => {
+  const target = config.urls.base;
+
+  if (req.headers.host !== target) {
+    return res.redirect(301, `https://${target}${req.url}`);
+  }
+
+  next();
+});
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -380,7 +390,7 @@ module.exports.run = (client) => {
         client_secret: config.clientSecret,
         grant_type: 'authorization_code',
         code: code,
-        redirect_uri: config.urls.base + 'auth',
+        redirect_uri: config.urls.full + 'auth',
       }).toString(), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
