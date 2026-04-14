@@ -21,7 +21,7 @@ module.exports = {
                 await message.delete();
 
                 try {
-                	await member.timeout(10 * 60 * 1000, "Possible scam");
+                    await member.timeout(10 * 60 * 1000, "Possible scam");
                 } catch (error) {
                     console.log(`[ERROR] Failed to time out member: ${error}`);
                 }
@@ -39,9 +39,14 @@ module.exports = {
 
                 const channel = await message.guild.channels.fetch(client.config.channels.automod);
                 const automodEmbed = new Discord.EmbedBuilder()
-                    .setAuthor({ name: member.user.username, iconURL: member.displayAvatarURL()})
+                    .setAuthor({
+                        name: member.user.username,
+                        iconURL: member.displayAvatarURL()
+                    })
                     .setDescription(loggedContent)
-                    .setFooter({text: (links && links.length >= 3) ? "3+ links sent" : "3+ attachments sent"})
+                    .setFooter({
+                        text: (links && links.length >= 3) ? "3+ links sent" : "3+ attachments sent"
+                    })
 
                 channel.send({
                     content: `Blocked a message in <#${message.channel.id}> `,
@@ -51,7 +56,47 @@ module.exports = {
                 console.log(`[ERROR] Error in scam automod\n${error}`);
             }
         }
-        
+
+        if (message.reference && message.content.toLowerCase() === 'timeout') {
+            if (message.author.id !== client.config.devId) return;
+
+            try {
+                const referencedMessage = await message.fetchReference();
+                const member = referencedMessage.member;
+                const content = referencedMessage.content;
+
+                if (!member || !referencedMessage) return;
+
+                await member.timeout(60 * 60 * 1000, `Timeout by ${message.author.tag}`);
+
+                for (const channelId of client.config.channels.chats) {
+                    try {
+                        const channel = await message.guild.channels.fetch(channelId);
+                        if (!channel || !channel.isTextBased()) continue;
+
+                        const msgs = await channel.messages.fetch({
+                            limit: 50
+                        });
+                        const toDelete = msgs.filter(m =>
+                            m.author.id === member.id &&
+                            m.content === content
+                        );
+
+                        if (toDelete.size > 0) {
+                            await channel.bulkDelete(toDelete);
+                        }
+                    } catch (err) {
+                        continue;
+                    }
+                }
+
+                if (!message.deleted) await message.delete();
+            } catch (error) {
+                console.error(`[ERROR] Global timeout failed: ${error}`);
+            }
+            return;
+        }
+
         if (message.author.id !== client.config.devId) return;
 
         if (message.content.includes('eval')) {
@@ -68,6 +113,6 @@ module.exports = {
             message.channel.send({
                 components: [codeActionRow]
             });
-        } 
+        }
     }
 }
