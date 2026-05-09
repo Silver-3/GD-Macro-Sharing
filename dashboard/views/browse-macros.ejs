@@ -1,37 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <title>Browse Macros</title>
     <link rel="icon" href="/assets/logo.ico" type="image/x-icon">
-
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-
 <body>
-  <%- include('partials/navbar') %>
+    <%- include('partials/navbar') %>
 
-  <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="Input to search">
-
-    <div class="filters">
-        <select id="fileTypeFilter">
-            <option value="">Type: Any</option>
-        </select>
-
-        <select id="noclipFilter">
-            <option value="">Noclip: Any</option>
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-        </select>
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Input to search">
+        <div class="filters">
+            <select id="fileTypeFilter">
+                <option value="">Type: Any</option>
+                <% Object.keys(fileTypes).forEach(type => { %>
+                    <option value="<%= type %>">.<%= type %></option>
+                <% }) %>
+            </select>
+            <select id="noclipFilter">
+                <option value="">Noclip: Any</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+        </div>
     </div>
-  </div>
 
-  <div class="macro-grid" id="macro-grid"></div>
-  <script src="/js/browse-macros.js"></script>
+    <div class="macro-grid" id="macro-grid"></div>
+
+    <script>
+        window.SERVER_ID = "<%- serverId %>";
+    </script>
+    <script src="/js/browse-macros.js"></script>
 </body>
-
 </html>

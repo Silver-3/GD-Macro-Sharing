@@ -1,3 +1,5 @@
+window.FILE_TYPES = JSON.parse(document.getElementById('fileTypesData').textContent);
+
 window.addEventListener('DOMContentLoaded', () => {
   const levelIdInput = document.getElementById("id");
   const nameInput = document.getElementById("name");
@@ -14,19 +16,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
   let expectedFileTypes = [];
 
-  fetch('/api/fileTypes')
-    .then(res => res.json())
-    .then(data => {
-      expectedFileTypes = Object.values(data).flat();
-
-      if (fileInput) {
-        const acceptString = expectedFileTypes.map(type => '.' + type).join(', ');
-        fileInput.setAttribute('accept', acceptString);
-      }
-    })
-    .catch(error => {
-      console.log(error);
-    });
+  const expectedFileTypes = Object.values(window.FILE_TYPES).flat();
+  if (fileInput) {
+    fileInput.setAttribute('accept', expectedFileTypes.map(t => '.' + t).join(', '));
+}
 
   function checkFile() {
     if (fileInput.files.length > 0) {

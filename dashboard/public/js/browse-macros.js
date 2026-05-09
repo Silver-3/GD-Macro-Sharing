@@ -48,27 +48,8 @@ function toggleInfo(element, userId) {
 
 window.addEventListener('DOMContentLoaded', () => {
     let allMacros = [];
-    let serverId = "";
+    let serverId = window.SERVER_ID;
     let renderLoopId = 0;
-
-    fetch('/api/config')
-        .then(res => res.json())
-        .then(data => {
-            serverId = data.serverId;
-        })
-
-    fetch('/api/fileTypes')
-        .then(res => res.json())
-        .then(data => {
-            const fileTypeFilter = document.getElementById("fileTypeFilter");
-            Object.keys(data).forEach(type => {
-                const option = document.createElement("option");
-                option.value = type;
-                option.textContent = `.${type}`;
-                fileTypeFilter.appendChild(option);
-            });
-        })
-        .catch(error => console.error("Error loading file types:", error))
 
     async function loadMacros() {
         try {

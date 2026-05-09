@@ -150,6 +150,18 @@ async function tallyMacros() {
 }
 
 module.exports.run = (client) => {
+  app.use(async (req, res, next) => {
+    res.locals.currentUser = null;
+
+    if (req.session.userId) {
+      try {
+        res.locals.currentUser = await client.users.fetch(req.session.userId);
+      } catch {}
+    }
+
+    next();
+  });
+
   app.use(bodyParser.urlencoded({
     extended: true
   }));
@@ -159,8 +171,46 @@ module.exports.run = (client) => {
 
   // -- Website Routes --
 
-  app.get('/', (req, res) => {
-    res.render('home');
+  app.get('/', async (req, res) => {
+    try {
+      const counts = await tallyMacros();
+
+      const sorted = [...counts.entries()]
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 10);
+
+      const totalMacros = [...counts.values()].reduce((a, b) => a + b, 0);
+
+      const leaderboard = await Promise.all(sorted.map(async ([userID, count]) => {
+        try {
+          const user = await client.users.fetch(userID);
+
+          return {
+            username: user.globalName || user.username,
+            avatar: user.displayAvatarURL({ size: 64 }),
+            count,
+            isMe: userID === req.session.userId
+          };
+        } catch (error) {
+          return {
+            username: "Unknown User",
+            avatar: null,
+            count,
+            isMe: false
+          };
+        }
+      }));
+
+      res.render('home', {
+        leaderboard,
+        totalMacros
+      });
+    } catch (error) {
+      res.render('home', {
+        leaderboard: [],
+        totalMacros: 0
+      });
+    }
   });
 
   app.get('/auth', (req, res) => {
@@ -168,24 +218,21 @@ module.exports.run = (client) => {
   });
 
   app.get('/sign-in', (req, res) => {
-    res.render('sign-in');
+    const returnUrl = encodeURIComponent(req.query.returnUrl || '/');
+    res.redirect(`${config.urls.oauth2}&state=${returnUrl}`);
   });
 
   app.get('/browse-macros', (req, res) => {
-    res.render('browse-macros');
+    res.render('browse-macros', {
+      fileTypes: config.fileTypes,
+      serverId: config.serverId
+    });
   });
 
   app.get("/upload-macro", (req, res) => {
-    const userID = req.session.userId;
-
-    if (!userID) {
-      return res.render('upload-macro', {
-        showLoginModal: true
-      });
-    }
-
     res.render('upload-macro', {
-      showLoginModal: false
+      showLoginModal: !req.session.userId,
+      fileTypes: config.fileTypes
     });
   });
 
@@ -326,8 +373,8 @@ module.exports.run = (client) => {
     }
   });
 
-  app.get('/api/macros', (req, res) => {
-    const macros = db.all();
+  app.get('/api/macros', async (req, res) => {
+    const macros = await db.all();
     res.json({
       macros
     });
@@ -414,49 +461,6 @@ module.exports.run = (client) => {
       res.status(500).json({
         success: false,
         error: "Authentication failed"
-      });
-    }
-  });
-
-  app.get('/api/leaderboard', async (req, res) => {
-    try {
-      const counts = await tallyMacros();
-
-      const sorted = [...counts.entries()]
-        .sort(([, a], [, b]) => b - a)
-        .slice(0, 10);
-
-      const totalMacros = [...counts.values()].reduce((a, b) => a + b, 0);
-
-      const leaderboard = await Promise.all(sorted.map(async ([userID, total]) => {
-        try {
-          const user = await client.users.fetch(userID);
-          return {
-            username: user.globalName || user.username,
-            avatar: user.displayAvatarURL({
-              size: 64
-            }),
-            count: total,
-            isMe: userID === req.session.userId
-          };
-        } catch {
-          return {
-            username: "Unknown User",
-            avatar: null,
-            count: total,
-            isMe: false
-          };
-        }
-      }));
-
-      res.json({
-        leaderboard,
-        totalMacros
-      });
-    } catch (error) {
-      console.error("Leaderboard API Error:", error);
-      res.status(500).json({
-        error: "Failed to load leaderboard"
       });
     }
   });

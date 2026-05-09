@@ -37,13 +37,32 @@
 
   <section class="leaderboard-section">
     <h2>Macro Upload Leaderboard</h2>
-    <div id="leaderboard-container">
-      <p>Loading rankings...</p>
-    </div>
-    <p id="total-macros" style="font-size: 0.8em; color: #888; margin-top: 15px;"></p>
-  </section>
 
-  <script src="/js/home.js"></script>
+    <% if (leaderboard.length === 0) { %>
+      <p>No macros uploaded yet!</p>
+    <% } else { %>
+      <table style="width:100%; text-align:left; border-collapse:collapse;">
+        <% leaderboard.forEach((user, index) => { %>
+          <tr style="<%= user.isMe ? 'background: rgba(88,101,242,0.1);' : '' %> border-bottom: 1px solid #333;">
+            <td style="padding:10px;">#<%= index + 1 %></td>
+            <td style="padding:10px;">
+              <img src="<%= user.avatar || 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png' %>"
+                   style="width:30px; border-radius:50%; vertical-align:middle; margin-right:10px;">
+              <strong><%= user.username %></strong>
+              <% if (user.isMe) { %>
+                <span style="color:#5865F2;">(You)</span>
+              <% } %>
+            </td>
+            <td style="padding:10px; text-align:right;"><%= user.count %> macros</td>
+          </tr>
+        <% }) %>
+      </table>
+    <% } %>
+
+    <p style="font-size:0.8em; color:#888; margin-top:15px;">
+      Total macros uploaded in this server: <%= totalMacros %>
+    </p>
+  </section>
 </body>
 
 </html>
