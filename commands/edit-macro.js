@@ -8,9 +8,18 @@ const db = require('../handlers/database.js');
  * @param {Discord.CommandInteraction} interaction 
  */
 module.exports.run = async (interaction, client) => {
+    const isDev = interaction.user.id === client.config.devId;
+    const uploadedBy = db.get(interaction.channel.id)?.userId;
+    const isUploader = uploadedBy && uploadedBy === interaction.user.id;
+
+    if (!isDev && !isUploader) return interaction.reply({
+        content: '❌ You do not have permission to edit this macro',
+        flags: Discord.MessageFlags.Ephemeral
+    });
+
     const levelId = interaction.options.getString("id");
     if (!interaction.channel.isThread()) return interaction.reply({
-        content: 'This channel is not a thread',
+        content: '❌ This channel is not a thread',
         flags: Discord.MessageFlags.Ephemeral
     });
 
@@ -82,11 +91,9 @@ module.exports.run = async (interaction, client) => {
 }
 
 module.exports.data = new SlashCommand()
-    .setName('edit-channel')
-    .setDescription('Edit the channel info')
+    .setName('edit-macro')
+    .setDescription('Edit the macro info')
     .addStringOption(option => option
         .setName("id")
         .setDescription("Level id")
         .setRequired(true))
-
-module.exports.data.devOnly = true;

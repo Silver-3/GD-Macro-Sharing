@@ -19,6 +19,15 @@ module.exports.run = async (interaction, client) => {
         });
     }
 
+    const isDev = interaction.user.id === client.config.devId;
+    const uploadedBy = db.get(channel.id)?.userId;
+    const isUploader = uploadedBy && uploadedBy === interaction.user.id;
+    
+    if (!isDev && !isUploader) return interaction.reply({
+        content: '❌ You do not have permission to delete this macro',
+        flags: Discord.MessageFlags.Ephemeral
+    });
+
     const embed = new Discord.EmbedBuilder()
         .setTitle('Confirmation')
         .setColor('Blurple')
@@ -104,5 +113,3 @@ module.exports.data = new SlashCommand()
     .addChannelOption(option => option
         .setName("channel")
         .setDescription("Channel to delete"))
-
-module.exports.data.devOnly = true;
