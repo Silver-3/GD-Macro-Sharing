@@ -14,8 +14,6 @@ window.addEventListener('DOMContentLoaded', () => {
   const submitButton = document.getElementById("submitButton");
   const uploadButton = document.getElementById("uploadButton");
 
-  let expectedFileTypes = [];
-
   const expectedFileTypes = Object.values(window.FILE_TYPES).flat();
   if (fileInput) {
     fileInput.setAttribute('accept', expectedFileTypes.map(t => '.' + t).join(', '));
