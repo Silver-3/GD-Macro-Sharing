@@ -299,7 +299,7 @@ module.exports.run = (client) => {
     const macroFolder = path.join(__dirname, "..", "macros", channelId);
 
     if (option === "link") {
-      if (fs.existsSync(macroFolder)) return res.send(`${config.urls.base}download/${channelId}/download`);
+      if (fs.existsSync(macroFolder)) return res.send(`download/${channelId}/download`);
 
       const channel = await client.channels.fetch(channelId).catch(() => null);
       if (!channel) return res.status(404).send(`Macro thread not found: [${channelId}]`);
