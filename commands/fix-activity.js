@@ -10,7 +10,10 @@ module.exports.run = async (interaction, client) => {
         type: Discord.ActivityType.Watching
     });
 
-    interaction.reply({ content: '✅ Activity fixed' });
+    interaction.reply({ 
+        content: '✅ Activity fixed',
+        flags: Discord.MessageFlags.Ephemeral
+    });
 }
 
 module.exports.data = new SlashCommand()
