@@ -2,12 +2,13 @@ const Discord = require('discord.js');
 const Tesseract = require('tesseract.js');
 const https = require('https');
 
-const SCAM_DOMAINS  = ['kasowin.com', 'serowin.com', 'kasowin', 'serowin'];
+const SCAM_DOMAINS  = ['kasowin.com', 'serowin.com', 'kasowin', 'serowin', 'civaplays.com', 'civaplays'];
 const SCAM_PHRASES  = [
     'promo code', 'claim your reward', 'withdrawal success',
     'crypto casino', 'was successfully', 'receive your',
     'bonus immediately', 'enter the special', 'vyro project',
-    'activate code', 'rakeback', 'vip-club'
+    'activate code', 'rakeback', 'vip-club', 'casino', '$2,500 bonus',
+    'claim your reward', 'bonus instantly'
 ];
 
 /**
@@ -96,7 +97,7 @@ module.exports = {
         let scamImageDetected = false;
         let scamImageReason   = null;
 
-        if (message.attachments?.size > 2) {
+        if (message.attachments?.size >= 2) {
             try {
                 const scan = await scanImagesForScam(message);
                 scamImageDetected = scan.detected;
