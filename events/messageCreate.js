@@ -11,8 +11,9 @@ const SCAM_PHRASES  = [
     'claim your reward', 'bonus instantly'
 ];
 
+const pendingScans = new Map();
+
 /**
- * Downloads an image from a URL using built-in https and returns a Buffer
  * @param {string} url
  * @returns {Promise<Buffer>}
  */
@@ -28,8 +29,6 @@ async function fetchImageBuffer(url) {
 }
 
 /**
- * Downloads a Discord image attachment and runs OCR on it
- * Returns extracted text, or empty string on failure
  * @param {string} url
  * @returns {Promise<string>}
  */
@@ -45,7 +44,6 @@ async function extractTextFromImage(url) {
 }
 
 /**
- * Scans all image attachments in a message for scam text via OCR
  * @param {Discord.Message} message
  * @returns {Promise<{ detected: boolean, reason: string | null }>}
  */
@@ -81,6 +79,99 @@ async function scanImagesForScam(message) {
     return { detected: false, reason: null };
 }
 
+/**
+ * @param {Discord.Message} triggerMessage
+ * @param {Discord.Message[]} messages
+ * @param {string} reason
+ * @param {Discord.Client} client
+ */
+async function handleScamDetected(triggerMessage, messages, reason, client) {
+    const member = triggerMessage.member;
+    if (!member) return;
+    if (member.roles.cache.has(client.config.roles.img)) return;
+
+    try {
+        await member.timeout(10 * 60 * 1000, "Possible scam");
+    } catch (error) {
+        console.log(`[ERROR] Failed to time out member: ${error}`);
+    }
+
+    const channelsAffected = new Set();
+    for (const msg of messages) {
+        try {
+            await msg.delete();
+            channelsAffected.add(msg.channel.id);
+        } catch (error) {
+            console.log(`[ERROR] Failed to delete message ${msg.id}: ${error}`);
+        }
+    }
+
+    let loggedContent = triggerMessage.content || "";
+
+    if (triggerMessage.attachments?.size > 0) {
+        const attachmentNames = triggerMessage.attachments.map(a => `📎 [Attachment: ${a.name}]`).join('\n');
+        loggedContent = loggedContent ? `${loggedContent}\n\n${attachmentNames}` : attachmentNames;
+    }
+
+    if (loggedContent.length > 4096) {
+        loggedContent = loggedContent.substring(0, 4093) + "...";
+    }
+
+    try {
+        const channel = await triggerMessage.guild.channels.fetch(client.config.channels.automod);
+        const automodEmbed = new Discord.EmbedBuilder()
+            .setAuthor({
+                name: member.user.username,
+                iconURL: member.displayAvatarURL()
+            })
+            .setDescription(loggedContent)
+            .setFooter({ text: `Reason - ${reason}` });
+
+        channel.send({
+            content: `Blocked scam message${channelsAffected.size >= 2 ? 's' : ''} from <@${member.id}> across ${channelsAffected.size} channel${channelsAffected.size >= 2 ? 's' : ''}`,
+            embeds: [automodEmbed]
+        });
+    } catch (error) {
+        console.log(`[ERROR] Error in scam automod\n${error}`);
+    }
+}
+
+/**
+ * @param {Discord.Message} message
+ * @param {Discord.Client} client
+ */
+async function handleScamCheck(message, client) {
+    const member = message.member;
+    if (member?.roles.cache.has(client.config.roles.img)) return;
+
+    const userId = message.author.id;
+
+    let entry = pendingScans.get(userId);
+    if (!entry) {
+        entry = { messages: [], checking: false };
+        pendingScans.set(userId, entry);
+    }
+
+    entry.messages.push(message);
+    if (entry.checking) return;
+
+    entry.checking = true;
+
+    try {
+        const scan = await scanImagesForScam(message);
+        const bufferedMessages = entry.messages;
+        
+        pendingScans.delete(userId);
+
+        if (scan.detected) {
+            await handleScamDetected(message, bufferedMessages, scan.reason, client);
+        }
+    } catch (error) {
+        console.log(`[ERROR] Scam image scan failed: ${error}`);
+        pendingScans.delete(userId);
+    }
+}
+
 module.exports = {
     name: 'messageCreate',
     once: false,
@@ -94,58 +185,11 @@ module.exports = {
         const urlRegex = /(https?:\/\/[^\s]+)/g;
         const links = message.content.match(urlRegex);
 
-        let scamImageDetected = false;
-        let scamImageReason   = null;
-
         if (message.attachments?.size >= 2) {
             try {
-                const scan = await scanImagesForScam(message);
-                scamImageDetected = scan.detected;
-                scamImageReason   = scan.reason;
+                await handleScamCheck(message, client);
             } catch (error) {
                 console.log(`[ERROR] Scam image scan failed: ${error}`);
-            }
-        }
-
-        if (scamImageDetected) {
-            const member = message.member;
-            if (member.roles.cache.has(client.config.roles.img)) return;
-
-            try {
-                await message.delete();
-
-                try {
-                    await member.timeout(10 * 60 * 1000, "Possible scam");
-                } catch (error) {
-                    console.log(`[ERROR] Failed to time out member: ${error}`);
-                }
-
-                let loggedContent = message.content || "";
-
-                if (message.attachments?.size > 0) {
-                    const attachmentNames = message.attachments.map(a => `📎 [Attachment: ${a.name}]`).join('\n');
-                    loggedContent = loggedContent ? `${loggedContent}\n\n${attachmentNames}` : attachmentNames;
-                }
-
-                if (loggedContent.length > 4096) {
-                    loggedContent = loggedContent.substring(0, 4093) + "...";
-                }
-
-                const channel = await message.guild.channels.fetch(client.config.channels.automod);
-                const automodEmbed = new Discord.EmbedBuilder()
-                    .setAuthor({
-                        name: member.user.username,
-                        iconURL: member.displayAvatarURL()
-                    })
-                    .setDescription(loggedContent)
-                    .setFooter({ text: "Scam image detected" });
-
-                channel.send({
-                    content: `Blocked a message in <#${message.channel.id}>`,
-                    embeds: [automodEmbed]
-                });
-            } catch (error) {
-                console.log(`[ERROR] Error in scam automod\n${error}`);
             }
         }
 
