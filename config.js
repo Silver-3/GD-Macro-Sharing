@@ -11,6 +11,7 @@ module.exports = {
 
     // -- Channel IDs --
     channels: {
+        ast: "1533467990199111680",
         cml: "1502442560638025768",
         gdr: "1321829383270436947",
         gdr2: "1477232439570075650",
@@ -20,6 +21,8 @@ module.exports = {
         tcm: "1484104396315951221",
         ttr: "1499635886990692442",
         ttr2: "1516744422669422592",
+        ttr3: "1544153967091654727",
+        ttrl: "1544153987517780109",
         xd: "1321829630780375040",
         zbf: "1454410123312107655",
         welcome: "1321829878084931615",
@@ -41,13 +44,14 @@ module.exports = {
     urls: {
         full: "https://gd.584924.xyz/",
         base: "gd.584924.xyz",
-        port: 9103,
+        port: 9102,
         invite: "https://discord.gg/H3vHJpz7Mj",
         oauth2: "https://discord.com/oauth2/authorize?client_id=1383593364582174790&response_type=code&redirect_uri=https%3A%2F%2Fgd.584924.xyz%2Fauth&scope=identify",
     },
 
     // -- Expected File Types --
     fileTypes: {
+        ast: ["ast"],
         cml: ["cml"],
         gdr: ["gdr", "gdr.json"],
         gdr2: ["gdr2"],
@@ -57,6 +61,8 @@ module.exports = {
         tcm: ["tcm"],
         ttr: ["ttr"],
         ttr2: ["ttr2"],
+        ttr3: ["ttr3"],
+        ttrl: ["ttrl"],
         xd: ["xd"],
         zbf: ["zbf"]
     }
