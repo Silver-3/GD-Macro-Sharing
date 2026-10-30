@@ -32,6 +32,12 @@ async function leaderboardImage(data) {
     for (let i = 0; i < data.length; i++) {
         const user = data[i];
 
+        // Divider when there is a gap in ranks (the viewer's row below the top 10)
+        if (i > 0 && user.rank !== data[i - 1].rank + 1) {
+            ctx.fillStyle = '#666666';
+            ctx.fillRect(30, currentY, width - 60, 1);
+        }
+
         if (user.isMe) {
             ctx.fillStyle = 'rgba(88, 101, 242, 0.1)';
             ctx.fillRect(10, currentY + 5, width - 20, rowHeight - 10);
@@ -39,7 +45,7 @@ async function leaderboardImage(data) {
 
         ctx.fillStyle = '#ffffff';
         ctx.font = '24px sans-serif';
-        ctx.fillText(`#${i + 1}`, 30, currentY + 45);
+        ctx.fillText(`#${user.rank}`, 30, currentY + 45);
 
         const avatarUrl = user.avatar || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
         const avatarImg = await Canvas.loadImage(avatarUrl);
@@ -80,16 +86,14 @@ async function leaderboardImage(data) {
  */
 module.exports.run = async (interaction, client) => {
     const counts = await tallyMacros();
-    const sorted = [...counts.entries()]
-        .sort(([, a], [, b]) => b - a)
-        .slice(0, 10);
+    const sortedAll = [...counts.entries()].sort(([, a], [, b]) => b - a);
+    const totalMacros = sortedAll.reduce((sum, [, c]) => sum + c, 0);
 
-    const totalMacros = [...counts.values()].reduce((a, b) => a + b, 0);
-
-    const leaderboardData = await Promise.all(sorted.map(async ([userID, total]) => {
+    const buildEntry = async (userID, total, rank) => {
         try {
             const user = await interaction.client.users.fetch(userID);
             return {
+                rank,
                 username: user.globalName || user.username,
                 avatar: user.displayAvatarURL({
                     extension: 'png',
@@ -100,13 +104,27 @@ module.exports.run = async (interaction, client) => {
             };
         } catch {
             return {
+                rank,
                 username: "Unknown",
                 avatar: null,
                 count: total,
                 isMe: false
             };
         }
-    }));
+    };
+
+    const leaderboardData = await Promise.all(
+        sortedAll.slice(0, 10).map(([userID, total], i) => buildEntry(userID, total, i + 1))
+    );
+
+    // If the user isn't in the top 10 but has uploaded macros, add their row below
+    if (!leaderboardData.some(u => u.isMe)) {
+        const idx = sortedAll.findIndex(([id]) => id === interaction.user.id);
+
+        if (idx !== -1) {
+            leaderboardData.push(await buildEntry(interaction.user.id, sortedAll[idx][1], idx + 1));
+        }
+    }
 
     const image = await leaderboardImage(leaderboardData);
     const attachment = new Discord.AttachmentBuilder(image, {

@@ -42,9 +42,9 @@
       <p>No macros uploaded yet!</p>
     <% } else { %>
       <table style="width:100%; text-align:left; border-collapse:collapse;">
-        <% leaderboard.forEach((user, index) => { %>
+        <% leaderboard.forEach((user) => { %>
           <tr style="<%= user.isMe ? 'background: rgba(88,101,242,0.1);' : '' %> border-bottom: 1px solid #333;">
-            <td style="padding:10px;">#<%= index + 1 %></td>
+            <td style="padding:10px;">#<%= user.rank %></td>
             <td style="padding:10px;">
               <img src="<%= user.avatar || 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png' %>"
                    style="width:30px; border-radius:50%; vertical-align:middle; margin-right:10px;">
@@ -56,6 +56,22 @@
             <td style="padding:10px; text-align:right;"><%= user.count %> macros</td>
           </tr>
         <% }) %>
+
+        <% if (typeof myEntry !== 'undefined' && myEntry) { %>
+          <tr>
+            <td colspan="3" style="text-align:center; color:#888; padding:4px;">&#8942;</td>
+          </tr>
+          <tr style="background: rgba(88,101,242,0.1); border-bottom: 1px solid #333;">
+            <td style="padding:10px;">#<%= myEntry.rank %></td>
+            <td style="padding:10px;">
+              <img src="<%= myEntry.avatar || 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png' %>"
+                   style="width:30px; border-radius:50%; vertical-align:middle; margin-right:10px;">
+              <strong><%= myEntry.username %></strong>
+              <span style="color:#5865F2;">(You)</span>
+            </td>
+            <td style="padding:10px; text-align:right;"><%= myEntry.count %> macros</td>
+          </tr>
+        <% } %>
       </table>
     <% } %>
 

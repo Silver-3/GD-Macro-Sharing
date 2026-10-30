@@ -175,17 +175,15 @@ module.exports.run = (client) => {
     try {
       const counts = await tallyMacros();
 
-      const sorted = [...counts.entries()]
-        .sort(([, a], [, b]) => b - a)
-        .slice(0, 10);
+      const sortedAll = [...counts.entries()].sort(([, a], [, b]) => b - a);
+      const totalMacros = sortedAll.reduce((sum, [, c]) => sum + c, 0);
 
-      const totalMacros = [...counts.values()].reduce((a, b) => a + b, 0);
-
-      const leaderboard = await Promise.all(sorted.map(async ([userID, count]) => {
+      const buildEntry = async (userID, count, rank) => {
         try {
           const user = await client.users.fetch(userID);
 
           return {
+            rank,
             username: user.globalName || user.username,
             avatar: user.displayAvatarURL({ size: 64 }),
             count,
@@ -193,21 +191,41 @@ module.exports.run = (client) => {
           };
         } catch (error) {
           return {
+            rank,
             username: "Unknown User",
             avatar: null,
             count,
             isMe: false
           };
         }
-      }));
+      };
+
+      const leaderboard = await Promise.all(
+        sortedAll.slice(0, 10).map(([userID, count], i) => buildEntry(userID, count, i + 1))
+      );
+
+      // Only add an extra row if the viewer is logged in, has uploaded something,
+      // and is not already in the top 10
+      let myEntry = null;
+      const me = req.session.userId;
+
+      if (me && !leaderboard.some(u => u.isMe)) {
+        const idx = sortedAll.findIndex(([id]) => id === me);
+
+        if (idx !== -1) {
+          myEntry = await buildEntry(me, sortedAll[idx][1], idx + 1);
+        }
+      }
 
       res.render('home', {
         leaderboard,
+        myEntry,
         totalMacros
       });
     } catch (error) {
       res.render('home', {
         leaderboard: [],
+        myEntry: null,
         totalMacros: 0
       });
     }
